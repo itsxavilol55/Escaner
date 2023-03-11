@@ -43,10 +43,24 @@ public class App extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == escanear) {
             String[] lineas = txt.getText().split("\\r?\\n");
-            for (String linea : lineas) {
-                listado.add(new JLabel(linea));
-            }
+            for (String linea : lineas)
+                validarToken(linea);
             revalidate();
         }
+    }
+
+    private void validarToken(String linea) {
+        String token = "";
+        linea = linea.trim();
+        boolean esLetra = true;
+        for (int i = 0; i < linea.length(); i++) {
+            char actual = linea.charAt(i);
+            if ((actual >= 'A' && actual <= 'Z') || (actual >= 'a' && actual <= 'z') && esLetra) {
+                esLetra = true;
+                token += actual;
+            } else
+                esLetra = false;
+        }
+        System.out.println(token);
     }
 }
