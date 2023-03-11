@@ -6,6 +6,9 @@ public class App extends JFrame implements ActionListener {
     private JTextArea txt;
     private JButton escanear;
     private JPanel listado;
+    private String alfabeto = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private String numeros = "0123456789";
+    private String rels = "><!=";
 
     public static void main(String[] args) throws Exception {
         new App();
@@ -30,7 +33,7 @@ public class App extends JFrame implements ActionListener {
         }
         txt.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         txt.setFont(fuente);
-        listado.setLayout(new BoxLayout(listado, 1));
+        listado.setLayout(new GridLayout(0, 2));
         escanear.addActionListener(this);
         add(txt);
         add(escanear);
@@ -50,17 +53,34 @@ public class App extends JFrame implements ActionListener {
     }
 
     private void validarToken(String linea) {
-        String token = "";
+        String Id = "";
+        String OpRel = "";
+        String numero = "";
         linea = linea.trim();
         boolean esLetra = true;
         for (int i = 0; i < linea.length(); i++) {
             char actual = linea.charAt(i);
-            if ((actual >= 'A' && actual <= 'Z') || (actual >= 'a' && actual <= 'z') && esLetra) {
+            if (alfabeto.contains("" + actual) && esLetra) {
                 esLetra = true;
-                token += actual;
+                Id += actual;
+                continue;
             } else
                 esLetra = false;
+            if (rels.contains("" + actual)) {
+                OpRel = "" + actual;
+                if (linea.charAt(i + 1) == '=') {
+                    OpRel = "" + actual + linea.charAt(i + 1);
+                    i++;
+                }
+            }
+            if (numeros.contains("" + actual))
+                numero += actual;
         }
-        System.out.println(token);
+        listado.add(new JLabel(Id));
+        listado.add(new JLabel("ID"));
+        listado.add(new JLabel(OpRel));
+        listado.add(new JLabel("Operador relacional"));
+        listado.add(new JLabel(numero));
+        listado.add(new JLabel("numero"));
     }
 }
