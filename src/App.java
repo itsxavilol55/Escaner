@@ -66,7 +66,8 @@ public class App extends JFrame implements ActionListener {
             char siguiente = linea.charAt(i + 1);
             if (!alfabeto.contains("" + actual) && !numeros.contains("" + actual) && !rels.contains("" + actual))
                 throw new IllegalArgumentException("Carácter no permitido: " + actual);
-            else if (actual == ' ' && (!rels.contains("" + siguiente) || !numeros.contains("" + siguiente))) {
+            if (actual == ' ' && (!rels.contains("" + siguiente) && !numeros.contains("" + siguiente))) {
+                // System.out.println("-" + actual + "-" + siguiente + "-");
                 throw new IllegalArgumentException("Error: los tokens no están en el orden correcto o faltan algunos.");
             }
             if (alfabeto.contains("" + actual) && esLetra) {
@@ -87,6 +88,8 @@ public class App extends JFrame implements ActionListener {
                 if (i == linea.length() - 2)
                     numero += siguiente;
             }
+            if (i == linea.length() - 2 && numeros.contains("" + siguiente) && numero.length() == 0)
+                numero = "" + siguiente;
         }
         JLabel[] labels = {
                 new JLabel(Id),
