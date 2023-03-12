@@ -6,7 +6,7 @@ public class App extends JFrame implements ActionListener {
     private JTextArea txt;
     private JButton escanear;
     private JPanel listado;
-    private String alfabeto = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private String alfabeto = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ";
     private String numeros = "0123456789";
     private String rels = "><!=";
     private Font fuente = new Font("Tahoma", 15, 15);
@@ -61,8 +61,14 @@ public class App extends JFrame implements ActionListener {
         String numero = "";
         linea = linea.trim();
         boolean esLetra = true;
-        for (int i = 0; i < linea.length(); i++) {
+        for (int i = 0; i < linea.length() - 1; i++) {
             char actual = linea.charAt(i);
+            char siguiente = linea.charAt(i + 1);
+            if (!alfabeto.contains("" + actual) && !numeros.contains("" + actual) && !rels.contains("" + actual))
+                throw new IllegalArgumentException("Carácter no permitido: " + actual);
+            else if (actual == ' ' && (!rels.contains("" + siguiente) || !numeros.contains("" + siguiente))) {
+                throw new IllegalArgumentException("Error: los tokens no están en el orden correcto o faltan algunos.");
+            }
             if (alfabeto.contains("" + actual) && esLetra) {
                 esLetra = true;
                 Id += actual;
@@ -71,13 +77,16 @@ public class App extends JFrame implements ActionListener {
                 esLetra = false;
             if (rels.contains("" + actual)) {
                 OpRel = "" + actual;
-                if (linea.charAt(i + 1) == '=') {
-                    OpRel = "" + actual + linea.charAt(i + 1);
+                if (siguiente == '=') {
+                    OpRel = "" + actual + siguiente;
                     i++;
                 }
             }
-            if (numeros.contains("" + actual))
+            if (numeros.contains("" + actual)) {
                 numero += actual;
+                if (i == linea.length() - 2)
+                    numero += siguiente;
+            }
         }
         JLabel[] labels = {
                 new JLabel(Id),
