@@ -8,9 +8,6 @@ public class App extends JFrame implements ActionListener {
     private JTextArea txt;
     private JButton escanear;
     private JPanel listado;
-    private String alfabeto = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    private String numeros = "0123456789";
-    private String rels = "><!=";
     private Font fuente = new Font("Tahoma", 15, 15);
 
     public static void main(String[] args) throws Exception {
@@ -62,7 +59,6 @@ public class App extends JFrame implements ActionListener {
         String OpRel = "";
         String numero = "";
         String token = "";
-        boolean IdLeido = false;
         int length = linea.length();
         linea = linea.trim();
         if (length <= 1)
@@ -126,6 +122,7 @@ public class App extends JFrame implements ActionListener {
         JOptionPane.showMessageDialog(null, mensaje);
         listado.removeAll();
         revalidate();
+        validate();
         throw new IllegalArgumentException(mensaje);
     }
 }
