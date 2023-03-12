@@ -1,13 +1,14 @@
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class App extends JFrame implements ActionListener {
     private JTextArea txt;
     private JButton escanear;
     private JPanel listado;
-    private String alfabeto = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ";
+    private String alfabeto = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private String numeros = "0123456789";
     private String rels = "><!=";
     private Font fuente = new Font("Tahoma", 15, 15);
@@ -60,46 +61,49 @@ public class App extends JFrame implements ActionListener {
         String Id = "";
         String OpRel = "";
         String numero = "";
-        linea = linea.trim();
+        String token = "";
         boolean IdLeido = false;
         int length = linea.length();
+        linea = linea.trim();
         if (length <= 1)
             mensajeError("No se permiten cadenas tan cortas");
-        for (int i = 0; i < length - 1; i++) {
+        for (int i = 0; i < length; i++) {
             char actual = linea.charAt(i);
-            char siguiente = linea.charAt(i + 1);
-            if (!alfabeto.contains("" + actual) && !numeros.contains("" + actual) && !rels.contains("" + actual))
-                mensajeError("Carácter no permitido: " + actual);
-            if (actual == ' ' && (!rels.contains("" + siguiente) && !numeros.contains("" + siguiente))) {
-                // System.out.println("-" + actual + "-" + siguiente + "-");
-                mensajeError("Error: los tokens no están en el orden correcto o faltan algunos.");
-            }
-            if (!alfabeto.contains("" + actual) && !alfabeto.contains("" + siguiente) && !IdLeido)
-                mensajeError("Error solo se permiten letras en el ID");
-            if (!IdLeido) {
-                if (actual == ' ') {
-                    IdLeido = true;
+            if (actual == ' ' || i == length - 1) {
+                Pattern patron;
+                Matcher matcher;
+                if (Id.length() == 0) {
+                    patron = Pattern.compile("[a-zA-Z]+");
+                    matcher = patron.matcher(token);
+                    if (!matcher.matches())
+                        mensajeError("Error solo se permiten letras en el ID");
+                    Id = token;
+                    token = "";
+                    continue;
+
+                }
+                if (OpRel.length() == 0) {
+                    patron = Pattern.compile("(==|!=|<|<=|>|>=){1}");
+                    matcher = patron.matcher(token);
+                    if (!matcher.matches())
+                        mensajeError("Error, no es operador valido");
+                    OpRel = token;
+                    token = "";
                     continue;
                 }
-                Id += actual;
-                continue;
+                if (i == length - 1)
+                    token += actual;
+                if (numero.length() == 0) {
+                    patron = Pattern.compile("[0-9]+\\.?[0-9]*");
+                    matcher = patron.matcher(token);
+                    if (!matcher.matches())
+                        mensajeError("Error, no es numero valido");
+                    numero = token;
+                    token = "";
+                    continue;
+                }
             }
-            if (rels.contains("" + actual)) {
-                OpRel = "" + actual;
-                if (siguiente == '=' || siguiente == ' ') {
-                    OpRel = "" + actual + siguiente;
-                    i++;
-                } else
-                    mensajeError("Operador invalido");
-            }
-            if (numeros.contains("" + actual)) {
-                numero += actual;
-                if (i == length - 2)
-                    numero += siguiente;
-            }
-            if (i == length - 2 && numeros.contains("" + siguiente) && numero.length() == 0)
-                numero = "" + siguiente;
-
+            token += actual;
         }
         JLabel[] labels = {
                 new JLabel(Id),
@@ -121,6 +125,7 @@ public class App extends JFrame implements ActionListener {
     private void mensajeError(String mensaje) {
         JOptionPane.showMessageDialog(null, mensaje);
         listado.removeAll();
+        revalidate();
         throw new IllegalArgumentException(mensaje);
     }
 }
