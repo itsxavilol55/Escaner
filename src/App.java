@@ -65,12 +65,14 @@ public class App extends JFrame implements ActionListener {
             char actual = linea.charAt(i);
             char siguiente = linea.charAt(i + 1);
             if (!alfabeto.contains("" + actual) && !numeros.contains("" + actual) && !rels.contains("" + actual))
-                throw new IllegalArgumentException("Carácter no permitido: " + actual);
+                mensajeError("Carácter no permitido: " + actual);
             if (actual == ' ' && (!rels.contains("" + siguiente) && !numeros.contains("" + siguiente))) {
                 // System.out.println("-" + actual + "-" + siguiente + "-");
-                throw new IllegalArgumentException("Error: los tokens no están en el orden correcto o faltan algunos.");
+                mensajeError("Error: los tokens no están en el orden correcto o faltan algunos.");
             }
             if (alfabeto.contains("" + actual) && esLetra) {
+                if (!alfabeto.contains("" + siguiente))
+                    mensajeError("Error solo se permiten letras en el ID");
                 esLetra = true;
                 Id += actual;
                 continue;
@@ -106,5 +108,10 @@ public class App extends JFrame implements ActionListener {
             label.setFont(fuente);
             listado.add(label);
         }
+    }
+
+    private void mensajeError(String mensaje) {
+        throw new IllegalArgumentException(mensaje);
+
     }
 }
