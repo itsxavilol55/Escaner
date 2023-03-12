@@ -1,6 +1,7 @@
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
+import java.util.regex.Pattern;
 
 public class App extends JFrame implements ActionListener {
     private JTextArea txt;
@@ -60,8 +61,11 @@ public class App extends JFrame implements ActionListener {
         String OpRel = "";
         String numero = "";
         linea = linea.trim();
-        boolean esLetra = true;
-        for (int i = 0; i < linea.length() - 1; i++) {
+        boolean IdLeido = false;
+        int length = linea.length();
+        if (length <= 1)
+            mensajeError("No se permiten cadenas tan cortas");
+        for (int i = 0; i < length - 1; i++) {
             char actual = linea.charAt(i);
             char siguiente = linea.charAt(i + 1);
             if (!alfabeto.contains("" + actual) && !numeros.contains("" + actual) && !rels.contains("" + actual))
@@ -70,28 +74,32 @@ public class App extends JFrame implements ActionListener {
                 // System.out.println("-" + actual + "-" + siguiente + "-");
                 mensajeError("Error: los tokens no están en el orden correcto o faltan algunos.");
             }
-            if (alfabeto.contains("" + actual) && esLetra) {
-                if (!alfabeto.contains("" + siguiente))
-                    mensajeError("Error solo se permiten letras en el ID");
-                esLetra = true;
+            if (!alfabeto.contains("" + actual) && !alfabeto.contains("" + siguiente) && !IdLeido)
+                mensajeError("Error solo se permiten letras en el ID");
+            if (!IdLeido) {
+                if (actual == ' ') {
+                    IdLeido = true;
+                    continue;
+                }
                 Id += actual;
                 continue;
-            } else
-                esLetra = false;
+            }
             if (rels.contains("" + actual)) {
                 OpRel = "" + actual;
-                if (siguiente == '=') {
+                if (siguiente == '=' || siguiente == ' ') {
                     OpRel = "" + actual + siguiente;
                     i++;
-                }
+                } else
+                    mensajeError("Operador invalido");
             }
             if (numeros.contains("" + actual)) {
                 numero += actual;
-                if (i == linea.length() - 2)
+                if (i == length - 2)
                     numero += siguiente;
             }
-            if (i == linea.length() - 2 && numeros.contains("" + siguiente) && numero.length() == 0)
+            if (i == length - 2 && numeros.contains("" + siguiente) && numero.length() == 0)
                 numero = "" + siguiente;
+
         }
         JLabel[] labels = {
                 new JLabel(Id),
@@ -111,7 +119,8 @@ public class App extends JFrame implements ActionListener {
     }
 
     private void mensajeError(String mensaje) {
+        JOptionPane.showMessageDialog(null, mensaje);
+        listado.removeAll();
         throw new IllegalArgumentException(mensaje);
-
     }
 }
