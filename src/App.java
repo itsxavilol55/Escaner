@@ -1,6 +1,10 @@
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -9,6 +13,7 @@ public class App extends JFrame implements ActionListener {
     private JButton escanear;
     private JPanel listado;
     private Font fuente = new Font("Tahoma", 15, 15);
+    private Hashtable<String, String> tokens = new Hashtable<String, String>();
 
     public static void main(String[] args) throws Exception {
         new App();
@@ -55,60 +60,31 @@ public class App extends JFrame implements ActionListener {
     }
 
     private void validarToken(String linea) {
-        String Id = "";
-        String OpRel = "";
-        String numero = "";
         String token = "";
-        int length = linea.length();
         linea = linea.trim();
+        linea += " ";
+        int length = linea.length();
         if (length <= 1)
             mensajeError("No se permiten cadenas tan cortas");
         for (int i = 0; i < length; i++) {
             char actual = linea.charAt(i);
-            if (actual == ' ' || i == length - 1) {
-                Pattern patron;
-                Matcher matcher;
-                if (Id.length() == 0) {
-                    patron = Pattern.compile("[a-zA-Z]+");
-                    matcher = patron.matcher(token);
-                    if (!matcher.matches())
-                        mensajeError("Error solo se permiten letras en el ID");
-                    Id = token;
-                    token = "";
+            if (actual == ' ') {
+                String tokenAux = token;
+                token = "";
+                if (validaID(tokenAux))
                     continue;
-
-                }
-                if (OpRel.length() == 0) {
-                    patron = Pattern.compile("(==|!=|<|<=|>|>=){1}");
-                    matcher = patron.matcher(token);
-                    if (!matcher.matches())
-                        mensajeError("Error, no es operador valido");
-                    OpRel = token;
-                    token = "";
+                if (validaOprel(tokenAux))
                     continue;
-                }
-                if (i == length - 1)
-                    token += actual;
-                if (numero.length() == 0) {
-                    patron = Pattern.compile("[0-9]+\\.?[0-9]*");
-                    matcher = patron.matcher(token);
-                    if (!matcher.matches())
-                        mensajeError("Error, no es numero valido");
-                    numero = token;
-                    token = "";
+                if (validaNumero(tokenAux))
                     continue;
-                }
             }
             token += actual;
         }
-        JLabel[] labels = {
-                new JLabel(Id),
-                new JLabel("ID"),
-                new JLabel(OpRel),
-                new JLabel("Operador relacional"),
-                new JLabel(numero),
-                new JLabel("numero")
-        };
+        ArrayList<JLabel> labels = new ArrayList<JLabel>();
+        for (Entry<String, String> entry : tokens.entrySet()) {
+            labels.add(new JLabel(entry.getKey()));
+            labels.add(new JLabel(entry.getValue()));
+        }
         for (JLabel label : labels) {
             label.setMinimumSize(new Dimension(100, 25));
             label.setMaximumSize(new Dimension(100, 25));
@@ -116,6 +92,40 @@ public class App extends JFrame implements ActionListener {
             label.setFont(fuente);
             listado.add(label);
         }
+    }
+
+    private boolean validaID(String token) {
+        Pattern patron = Pattern.compile("[a-zA-Z]+");
+        Matcher matcher = patron.matcher(token);
+        if (!matcher.matches()) {
+            // mensajeError("Error solo se permiten letras en el ID");
+            return false;
+        }
+        tokens.put(token, "Identificador");
+        token = "";
+        return true;
+    }
+
+    private boolean validaOprel(String token) {
+        Pattern patron = Pattern.compile("(==|!=|<|<=|>|>=){1}");
+        Matcher matcher = patron.matcher(token);
+        if (!matcher.matches())
+            // mensajeError("Error, no es operador valido");
+            return false;
+        tokens.put(token, "Operador Relacional");
+        token = "";
+        return true;
+    }
+
+    private boolean validaNumero(String token) {
+        Pattern patron = Pattern.compile("[0-9]+\\.?[0-9]*");
+        Matcher matcher = patron.matcher(token);
+        if (!matcher.matches())
+            // mensajeError("Error, no es numero valido");
+            return false;
+        tokens.put(token, "Numero");
+        token = "";
+        return true;
     }
 
     private void mensajeError(String mensaje) {
