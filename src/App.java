@@ -2,8 +2,8 @@ import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Hashtable;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -12,15 +12,18 @@ public class App extends JFrame implements ActionListener {
     private JTextArea txt;
     private JButton escanear;
     private JPanel listado;
-    private Font fuente = new Font("Tahoma", 15, 15);
+    private Font fuente = new Font("Tahoma", 16, 15);
     private Hashtable<String, String> tokens = new Hashtable<String, String>();
+    private String[] palabrasReservadas = { "if", "else", "while", "for", "switch", "case", "break", "default",
+            "return",
+            "int" };
 
     public static void main(String[] args) throws Exception {
         new App();
     }
 
     public App() {
-        setSize(800, 600);
+        setSize(900, 700);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setResizable(false);
@@ -101,7 +104,12 @@ public class App extends JFrame implements ActionListener {
             // mensajeError("Error solo se permiten letras en el ID");
             return false;
         }
-        tokens.put(token, "Identificador");
+        token = token.toLowerCase();
+
+        if (Arrays.asList(palabrasReservadas).contains(token))
+            tokens.put(token, "Palabra reservada");
+        else
+            tokens.put(token, "Identificador");
         token = "";
         return true;
     }
