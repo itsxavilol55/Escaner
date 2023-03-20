@@ -16,16 +16,10 @@ public class App extends JFrame implements ActionListener {
     private Font fuente = new Font("Tahoma", 16, 15);
     private Hashtable<String, String> tokens = new Hashtable<String, String>();
     private String[] palabrasReservadas = {
-            "if", "else", "while", "for",
+            "Program", "if", "else", "while", "for",
             "switch", "case", "break", "default",
             "return", "int" };
-    private String[] mensajes = {
-            "No hay error",
-            "Error solo se permiten letras en el ID",
-            "Error, no es operador valido",
-            "Error, no es numero valido" };
-    private int LineaCont = 0;
-    private int numeroError = 0;
+    private int LineaCont = 1;
     private boolean isError = false;
 
     public static void main(String[] args) throws Exception {
@@ -69,9 +63,13 @@ public class App extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == escanear) {
+            LineaCont = 1;
+            isError = false;
             tokens.clear();
-            LineaCont = 0;
             listado.removeAll();
+            revalidate();
+            validate();
+            listado.update(listado.getGraphics());
             error.setText("");
             String[] lineas = txt.getText().split("\\r?\\n");
             for (String linea : lineas) {
@@ -80,8 +78,22 @@ public class App extends JFrame implements ActionListener {
                 if (isError)
                     return;
             }
+            ArrayList<JLabel> labels = new ArrayList<JLabel>();
+            for (Entry<String, String> entry : tokens.entrySet()) {
+                labels.add(new JLabel(entry.getKey()));
+                labels.add(new JLabel(entry.getValue()));
+            }
+            for (JLabel label : labels) {
+                label.setMinimumSize(new Dimension(100, 25));
+                label.setMaximumSize(new Dimension(100, 25));
+                label.setPreferredSize(new Dimension(100, 25));
+                label.setFont(fuente);
+                listado.add(label);
+            }
             error.setText("");
             revalidate();
+            validate();
+            listado.update(listado.getGraphics());
         }
     }
 
@@ -99,44 +111,27 @@ public class App extends JFrame implements ActionListener {
             if (actual == ' ') {
                 String tokenAux = token;
                 token = "";
-                System.out.println("-" + tokenAux + "-");
                 if (validaID(tokenAux))
                     ;
                 else if (validaOprel(tokenAux))
                     ;
                 else if (validaNumero(tokenAux))
                     ;
-                if (numeroError != 0) {
-                    mensajeError(mensajes[numeroError]);
-                    numeroError = 0;
+                else {
+                    mensajeError("No es un token valido: '" + tokenAux + "'");
+                    return;
                 }
                 continue;
             }
             token += actual;
         }
-        ArrayList<JLabel> labels = new ArrayList<JLabel>();
-        for (Entry<String, String> entry : tokens.entrySet()) {
-            labels.add(new JLabel(entry.getKey()));
-            labels.add(new JLabel(entry.getValue()));
-        }
-        for (JLabel label : labels) {
-            label.setMinimumSize(new Dimension(100, 25));
-            label.setMaximumSize(new Dimension(100, 25));
-            label.setPreferredSize(new Dimension(100, 25));
-            label.setFont(fuente);
-            listado.add(label);
-        }
     }
 
     private boolean validaID(String token) {
-        System.out.println("valida ID " + token);
         Pattern patron = Pattern.compile("[a-zA-Z]+");
         Matcher matcher = patron.matcher(token);
-        if (!matcher.matches()) {
-            numeroError = (numeroError == 0) ? 1 : numeroError;
+        if (!matcher.matches())
             return false;
-        }
-        numeroError = 0;
         token = token.toLowerCase();
         if (Arrays.asList(palabrasReservadas).contains(token))
             tokens.put(token, "Palabra reservada");
@@ -147,28 +142,21 @@ public class App extends JFrame implements ActionListener {
     }
 
     private boolean validaOprel(String token) {
-        System.out.println("valida opRel " + token);
         Pattern patron = Pattern.compile("(==|!=|<|<=|>|>=){1}");
         Matcher matcher = patron.matcher(token);
         if (!matcher.matches()) {
-            numeroError = (numeroError == 0) ? 2 : numeroError;
             return false;
         }
-        numeroError = 0;
         tokens.put(token, "Operador Relacional");
         token = "";
         return true;
     }
 
     private boolean validaNumero(String token) {
-        System.out.println("valida numero " + token);
         Pattern patron = Pattern.compile("[0-9]+\\.?[0-9]*");
         Matcher matcher = patron.matcher(token);
-        if (!matcher.matches()) {
-            numeroError = (numeroError == 0) ? 3 : numeroError;
+        if (!matcher.matches())
             return false;
-        }
-        numeroError = 0;
         tokens.put(token, "Numero");
         token = "";
         return true;
@@ -177,8 +165,10 @@ public class App extends JFrame implements ActionListener {
     private void mensajeError(String mensaje) {
         isError = true;
         error.setText(mensaje + " -Linea: " + LineaCont);
+        tokens.clear();
         listado.removeAll();
         revalidate();
         validate();
+        listado.update(listado.getGraphics());
     }
 }
