@@ -256,7 +256,7 @@ public class App extends JFrame implements ActionListener {
     }
 
     private boolean validaNumero(String token) {
-        Pattern patron = Pattern.compile("[0-9]+\\.?[0-9]*");
+        Pattern patron = Pattern.compile("-?[0-9]+\\.?[0-9]*");
         Matcher matcher = patron.matcher(token);
         if (!matcher.matches())
             return false;
