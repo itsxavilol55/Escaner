@@ -1,6 +1,11 @@
 import java.awt.*;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.event.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
@@ -9,7 +14,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class App extends JFrame implements ActionListener {
+    private JMenuItem Nuevo, Abrir, Guardar;
     private JTextArea txt;
+    private JScrollPane scrollListado;
     private JButton escanear;
     private JPanel listado;
     private JLabel error;
@@ -19,6 +26,7 @@ public class App extends JFrame implements ActionListener {
             "Program", "if", "else", "while", "for",
             "switch", "case", "break", "default",
             "return", "int" };
+    private File archivo;
     private int LineaCont = 1;
     private boolean isError = false;
 
@@ -27,17 +35,28 @@ public class App extends JFrame implements ActionListener {
     }
 
     public App() {
+        interfaz();
+        eventos();
+    }
+
+    private void interfaz() {
+        setTitle("Supra");
         setSize(1000, 800);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setResizable(false);
         setLayout(null);
         JLabel label = new JLabel("Listado de Tokens");
+        JMenuBar BarraPrincipal = new JMenuBar();
+        JMenu MenuArchivo = new JMenu("Archivo");
         error = new JLabel("");
         listado = new JPanel();
         txt = new JTextArea();
-        escanear = new JButton("Escanear");
-        JScrollPane scrollListado = new JScrollPane(listado);
+        scrollListado = new JScrollPane(listado);
+        escanear = new JButton("Escanear");// Agregar botones y menu
+        Nuevo = new JMenuItem("Nuevo");
+        Abrir = new JMenuItem("Abrir");
+        Guardar = new JMenuItem("Guardar");
         {
             escanear.setBounds(160, 580, 120, 40);
             label.setBounds(500, 25, 200, 10);
@@ -51,7 +70,11 @@ public class App extends JFrame implements ActionListener {
         error.setForeground(Color.red);
         listado.setLayout(new GridLayout(0, 2));
         listado.setAlignmentY(Component.TOP_ALIGNMENT);
-        escanear.addActionListener(this);
+        MenuArchivo.add(Nuevo);
+        MenuArchivo.add(Abrir);
+        MenuArchivo.add(Guardar);
+        BarraPrincipal.add(MenuArchivo);
+        setJMenuBar(BarraPrincipal);
         add(txt);
         add(escanear);
         add(label);
@@ -60,40 +83,110 @@ public class App extends JFrame implements ActionListener {
         setVisible(true);
     }
 
+    private void eventos() {
+        escanear.addActionListener(this);
+        Nuevo.addActionListener(this);
+        Abrir.addActionListener(this);
+        Guardar.addActionListener(this);
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == escanear) {
-            LineaCont = 1;
-            isError = false;
-            tokens.clear();
-            listado.removeAll();
-            revalidate();
-            validate();
-            listado.update(listado.getGraphics());
-            error.setText("");
-            String[] lineas = txt.getText().split("\\r?\\n");
-            for (String linea : lineas) {
-                validarToken(linea);
-                LineaCont++;
-                if (isError)
-                    return;
+            escanear();
+            return;
+        }
+        if (e.getSource() == Nuevo) {
+            txt.setText("");
+            return;
+        }
+        if (e.getSource() == Abrir) {
+            Abrir();
+            return;
+        }
+        if (e.getSource() == Guardar) {
+            Guardar();
+            return;
+        }
+    }
+
+    private void escanear() {
+        LineaCont = 1;
+        isError = false;
+        tokens.clear();
+        listado.removeAll();
+        revalidate();
+        validate();
+        listado.update(listado.getGraphics());
+        error.setText("");
+        String[] lineas = txt.getText().split("\\r?\\n");
+        for (String linea : lineas) {
+            validarToken(linea);
+            LineaCont++;
+            if (isError)
+                return;
+        }
+        ArrayList<JLabel> labels = new ArrayList<JLabel>();
+        for (Entry<String, String> entry : tokens.entrySet()) {
+            labels.add(new JLabel(entry.getKey()));
+            labels.add(new JLabel(entry.getValue()));
+        }
+        for (JLabel label : labels) {
+            label.setMinimumSize(new Dimension(100, 25));
+            label.setMaximumSize(new Dimension(100, 25));
+            label.setPreferredSize(new Dimension(100, 25));
+            label.setFont(fuente);
+            listado.add(label);
+        }
+        error.setText("");
+        revalidate();
+        validate();
+        listado.update(listado.getGraphics());
+    }
+
+    private void Abrir() {
+        JFileChooser Abrir = new JFileChooser();
+        Abrir.setFileSelectionMode(JFileChooser.OPEN_DIALOG);
+        Abrir.setAcceptAllFileFilterUsed(false);
+        FileNameExtensionFilter Filtro = new FileNameExtensionFilter(".txt", "txt");
+        Abrir.setFileFilter(Filtro);
+        int Seleccionar = Abrir.showOpenDialog(null);
+        if (Seleccionar == JFileChooser.APPROVE_OPTION) {
+            archivo = Abrir.getSelectedFile();
+            try (FileReader fr = new FileReader(archivo)) {
+                String cadena = "";
+                int valor = fr.read();
+                while (valor != -1) {
+                    cadena = cadena + (char) valor;
+                    valor = fr.read();
+                }
+                txt.setText(cadena);
+            } catch (IOException ex) {
+
             }
-            ArrayList<JLabel> labels = new ArrayList<JLabel>();
-            for (Entry<String, String> entry : tokens.entrySet()) {
-                labels.add(new JLabel(entry.getKey()));
-                labels.add(new JLabel(entry.getValue()));
+        }
+    }
+
+    private void Guardar() {
+        JFileChooser guardar = new JFileChooser();
+        guardar.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        guardar.setFileFilter(new FileNameExtensionFilter(".txt", "txt"));
+        int returnVal = guardar.showSaveDialog(null);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            File file = guardar.getSelectedFile();
+            if (!file.getName().endsWith(".txt")) {
+                file = new File(file.getPath() + ".txt");
             }
-            for (JLabel label : labels) {
-                label.setMinimumSize(new Dimension(100, 25));
-                label.setMaximumSize(new Dimension(100, 25));
-                label.setPreferredSize(new Dimension(100, 25));
-                label.setFont(fuente);
-                listado.add(label);
+            try {
+
+                FileWriter writer = new FileWriter(file);
+                writer.write(txt.getText());
+                writer.close();
+                JOptionPane.showMessageDialog(null, "Archivo guardado correctamente");
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(null, "Error. No se pudo guardar el archivo");
+                ex.printStackTrace();
             }
-            error.setText("");
-            revalidate();
-            validate();
-            listado.update(listado.getGraphics());
         }
     }
 
