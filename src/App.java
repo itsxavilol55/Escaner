@@ -210,6 +210,8 @@ public class App extends JFrame implements ActionListener {
                     ;
                 else if (validaNumero(tokenAux))
                     ;
+                else if (validaComentario(tokenAux))
+                    return;
                 else {
                     mensajeError("No es un token valido: '" + tokenAux + "'");
                     return;
@@ -218,6 +220,15 @@ public class App extends JFrame implements ActionListener {
             }
             token += actual;
         }
+    }
+
+    private boolean validaComentario(String token) {
+        Pattern patron = Pattern.compile("\\/\\/.*");
+        Matcher matcher = patron.matcher(token);
+        if (!matcher.matches())
+            return false;
+        token = "";
+        return true;
     }
 
     private boolean validaID(String token) {
@@ -237,9 +248,8 @@ public class App extends JFrame implements ActionListener {
     private boolean validaOprel(String token) {
         Pattern patron = Pattern.compile("(==|!=|<|<=|>|>=){1}");
         Matcher matcher = patron.matcher(token);
-        if (!matcher.matches()) {
+        if (!matcher.matches())
             return false;
-        }
         tokens.put(token, "Operador Relacional");
         token = "";
         return true;
