@@ -12,6 +12,8 @@ import java.util.Hashtable;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.function.Predicate;
+import java.util.List;
 
 public class App extends JFrame implements ActionListener {
     private JMenuItem Nuevo, Abrir, Guardar;
@@ -21,14 +23,20 @@ public class App extends JFrame implements ActionListener {
     private JPanel listado;
     private JLabel error;
     private Font fuente = new Font("Tahoma", 16, 15);
-    private Hashtable<String, String> tokens = new Hashtable<String, String>();
-    private String[] palabrasReservadas = {
-            "Program", "if", "else", "while", "for",
-            "switch", "case", "break", "default",
-            "return", "int" };
     private File archivo;
     private int LineaCont = 1;
     private boolean isError = false;
+    private static Hashtable<String, String> tokens = new Hashtable<String, String>();
+    private static String[] palabrasReservadas = {
+            "Program", "if", "else", "while", "for",
+            "switch", "case", "break", "default",
+            "return", "int" };
+    private static final List<Predicate<String>> VALIDADORES = Arrays.asList(
+            App::validaComentario,
+            App::validaID,
+            App::validaOprel,
+            App::validaNumero,
+            App::validaAritmeticos);
 
     public static void main(String[] args) throws Exception {
         new App();
@@ -195,24 +203,18 @@ public class App extends JFrame implements ActionListener {
         linea = linea.trim();
         linea += " ";
         int length = linea.length();
-        if (length <= 1) {
-            mensajeError("No se permiten cadenas tan cortas");
-            return;
-        }
         for (int i = 0; i < length; i++) {
             char actual = linea.charAt(i);
             if (actual == ' ') {
                 String tokenAux = token;
                 token = "";
-                if (validaID(tokenAux))
-                    ;
-                else if (validaOprel(tokenAux))
-                    ;
-                else if (validaNumero(tokenAux))
-                    ;
-                else if (validaComentario(tokenAux))
-                    return;
-                else {
+                boolean valido = false;
+                for (Predicate<String> validador : VALIDADORES)
+                    if (validador.test(tokenAux)) {
+                        valido = true;
+                        break;
+                    }
+                if (!valido) {
                     mensajeError("No es un token valido: '" + tokenAux + "'");
                     return;
                 }
@@ -222,7 +224,17 @@ public class App extends JFrame implements ActionListener {
         }
     }
 
-    private boolean validaComentario(String token) {
+    private static boolean validaAritmeticos(String token) {
+        Pattern patron = Pattern.compile("(\\+|\\-|\\/|\\*|\\^|\\%|\\+\\+|\\-\\-){1}");
+        Matcher matcher = patron.matcher(token);
+        if (!matcher.matches())
+            return false;
+        tokens.put(token, "Operador Aritmetico");
+        token = "";
+        return true;
+    }
+
+    private static boolean validaComentario(String token) {
         Pattern patron = Pattern.compile("\\/\\/.*");
         Matcher matcher = patron.matcher(token);
         if (!matcher.matches())
@@ -231,7 +243,7 @@ public class App extends JFrame implements ActionListener {
         return true;
     }
 
-    private boolean validaID(String token) {
+    private static boolean validaID(String token) {
         Pattern patron = Pattern.compile("[a-zA-Z]+");
         Matcher matcher = patron.matcher(token);
         if (!matcher.matches())
@@ -245,7 +257,7 @@ public class App extends JFrame implements ActionListener {
         return true;
     }
 
-    private boolean validaOprel(String token) {
+    private static boolean validaOprel(String token) {
         Pattern patron = Pattern.compile("(==|!=|<|<=|>|>=){1}");
         Matcher matcher = patron.matcher(token);
         if (!matcher.matches())
@@ -255,7 +267,7 @@ public class App extends JFrame implements ActionListener {
         return true;
     }
 
-    private boolean validaNumero(String token) {
+    private static boolean validaNumero(String token) {
         Pattern patron = Pattern.compile("-?[0-9]+\\.?[0-9]*");
         Matcher matcher = patron.matcher(token);
         if (!matcher.matches())
