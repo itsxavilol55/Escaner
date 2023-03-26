@@ -28,15 +28,16 @@ public class App extends JFrame implements ActionListener {
     private boolean isError = false;
     private static Hashtable<String, String> tokens = new Hashtable<String, String>();
     private static String[] palabrasReservadas = {
-            "Program", "if", "else", "while", "for",
+            "program", "if", "else", "while", "for",
             "switch", "case", "break", "default",
-            "return", "int" };
+            "return", "int", "leerdato", "imprimir" };
     private static final List<Predicate<String>> VALIDADORES = Arrays.asList(
             App::validaComentario,
             App::validaID,
             App::validaOprel,
             App::validaNumero,
-            App::validaAritmeticos);
+            App::validaAritmeticos,
+            App::validaDelimitadores);
 
     public static void main(String[] args) throws Exception {
         new App();
@@ -106,6 +107,7 @@ public class App extends JFrame implements ActionListener {
         }
         if (e.getSource() == Nuevo) {
             txt.setText("");
+            Limpiar();
             return;
         }
         if (e.getSource() == Abrir) {
@@ -122,10 +124,7 @@ public class App extends JFrame implements ActionListener {
         LineaCont = 1;
         isError = false;
         tokens.clear();
-        listado.removeAll();
-        revalidate();
-        validate();
-        listado.update(listado.getGraphics());
+        Limpiar();
         error.setText("");
         String[] lineas = txt.getText().split("\\r?\\n");
         for (String linea : lineas) {
@@ -201,8 +200,20 @@ public class App extends JFrame implements ActionListener {
     private void validarToken(String linea) {
         String token = "";
         linea = linea.trim();
+        linea = linea.replaceAll("(\\d+);", "$1 ;");// 0; -> 0 ;
+        linea = linea.replaceAll("\"(\\S*)", "\" $1");// "texto -> " texto
+        linea = linea.replaceAll("(\\S*)\"", "$1 \"");// texto" -> texto "
+        linea = linea.replaceAll("\\(\"", "( \"");// (" -> ( "
+        linea = linea.replaceAll("([a-zA-Z]+)\\(", "$1 (");// texto( -> texto (
+        linea = linea.replaceAll("(\\-\\-|\\+\\+|[a-zA-Z]{1}[a-zA-Z0-9]*)\\)", "$1 )");// ++) -> ++ )
+        linea = linea.replaceAll("([a-zA-Z]{1}[a-zA-Z0-9]*)(\\-\\-|\\+\\+)", "$1 $2");// ID++ -> ID ++
+        linea = linea.replaceAll("(\\()([a-zA-Z]+|\\))", "$1 $2");// (texto -> ( texto
+        linea = linea.replaceAll("\\s{2,}", " ");// elimina 2 o mas espacios y deja uno solo
+        System.out.println(linea);
         linea += " ";
         int length = linea.length();
+        if (length == 1)
+            return;
         for (int i = 0; i < length; i++) {
             char actual = linea.charAt(i);
             if (actual == ' ') {
@@ -224,12 +235,32 @@ public class App extends JFrame implements ActionListener {
         }
     }
 
-    private static boolean validaAritmeticos(String token) {
-        Pattern patron = Pattern.compile("(\\+|\\-|\\/|\\*|\\^|\\%|\\+\\+|\\-\\-){1}");
+    private static boolean validaDelimitadores(String token) {
+        Pattern patron = Pattern.compile("(\\{|\\}|\\(|\\)|\\[|\\]|;|\"|,){1}");
         Matcher matcher = patron.matcher(token);
         if (!matcher.matches())
             return false;
-        tokens.put(token, "Operador Aritmetico");
+        if (token.equals(";"))
+            tokens.put(token, "Punto y Coma");
+        else if (token.equals("\""))
+            tokens.put(token, "Comillas");
+        else if (token.equals(","))
+            tokens.put(token, "Coma");
+        else
+            tokens.put(token, "Delimitador");
+        token = "";
+        return true;
+    }
+
+    private static boolean validaAritmeticos(String token) {
+        Pattern patron = Pattern.compile("(\\+|\\-|\\/|\\*|\\^|\\%|\\+\\+|\\-\\-|=){1}");
+        Matcher matcher = patron.matcher(token);
+        if (!matcher.matches())
+            return false;
+        if (token.equals("="))
+            tokens.put(token, "Operador de Asignacion");
+        else
+            tokens.put(token, "Operador Aritmetico");
         token = "";
         return true;
     }
@@ -244,7 +275,7 @@ public class App extends JFrame implements ActionListener {
     }
 
     private static boolean validaID(String token) {
-        Pattern patron = Pattern.compile("[a-zA-Z]+");
+        Pattern patron = Pattern.compile("[a-zA-Z]{1}[a-zA-Z0-9]*");
         Matcher matcher = patron.matcher(token);
         if (!matcher.matches())
             return false;
@@ -281,6 +312,10 @@ public class App extends JFrame implements ActionListener {
         isError = true;
         error.setText(mensaje + " -Linea: " + LineaCont);
         tokens.clear();
+        Limpiar();
+    }
+
+    private void Limpiar() {
         listado.removeAll();
         revalidate();
         validate();
