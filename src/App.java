@@ -139,9 +139,9 @@ public class App extends JFrame implements ActionListener {
             labels.add(new JLabel(entry.getValue()));
         }
         for (JLabel label : labels) {
-            label.setMinimumSize(new Dimension(100, 25));
-            label.setMaximumSize(new Dimension(100, 25));
-            label.setPreferredSize(new Dimension(100, 25));
+            label.setMinimumSize(new Dimension(100, 30));
+            label.setMaximumSize(new Dimension(100, 30));
+            label.setPreferredSize(new Dimension(100, 30));
             label.setFont(fuente);
             listado.add(label);
         }
@@ -209,7 +209,6 @@ public class App extends JFrame implements ActionListener {
         linea = linea.replaceAll("([a-zA-Z]{1}[a-zA-Z0-9]*)(\\-\\-|\\+\\+)", "$1 $2");// ID++ -> ID ++
         linea = linea.replaceAll("(\\()([a-zA-Z]+|\\))", "$1 $2");// (texto -> ( texto
         linea = linea.replaceAll("\\s{2,}", " ");// elimina 2 o mas espacios y deja uno solo
-        System.out.println(linea);
         linea += " ";
         int length = linea.length();
         if (length == 1)
@@ -233,36 +232,6 @@ public class App extends JFrame implements ActionListener {
             }
             token += actual;
         }
-    }
-
-    private static boolean validaDelimitadores(String token) {
-        Pattern patron = Pattern.compile("(\\{|\\}|\\(|\\)|\\[|\\]|;|\"|,){1}");
-        Matcher matcher = patron.matcher(token);
-        if (!matcher.matches())
-            return false;
-        if (token.equals(";"))
-            tokens.put(token, "Punto y Coma");
-        else if (token.equals("\""))
-            tokens.put(token, "Comillas");
-        else if (token.equals(","))
-            tokens.put(token, "Coma");
-        else
-            tokens.put(token, "Delimitador");
-        token = "";
-        return true;
-    }
-
-    private static boolean validaAritmeticos(String token) {
-        Pattern patron = Pattern.compile("(\\+|\\-|\\/|\\*|\\^|\\%|\\+\\+|\\-\\-|=){1}");
-        Matcher matcher = patron.matcher(token);
-        if (!matcher.matches())
-            return false;
-        if (token.equals("="))
-            tokens.put(token, "Operador de Asignacion");
-        else
-            tokens.put(token, "Operador Aritmetico");
-        token = "";
-        return true;
     }
 
     private static boolean validaComentario(String token) {
@@ -304,6 +273,36 @@ public class App extends JFrame implements ActionListener {
         if (!matcher.matches())
             return false;
         tokens.put(token, "Numero");
+        token = "";
+        return true;
+    }
+
+    private static boolean validaAritmeticos(String token) {
+        Pattern patron = Pattern.compile("(\\+|\\-|\\/|\\*|\\^|\\%|\\+\\+|\\-\\-|=){1}");
+        Matcher matcher = patron.matcher(token);
+        if (!matcher.matches())
+            return false;
+        if (token.equals("="))
+            tokens.put(token, "Operador de Asignacion");
+        else
+            tokens.put(token, "Operador Aritmetico");
+        token = "";
+        return true;
+    }
+
+    private static boolean validaDelimitadores(String token) {
+        Pattern patron = Pattern.compile("(\\{|\\}|\\(|\\)|\\[|\\]|;|\"|,){1}");
+        Matcher matcher = patron.matcher(token);
+        if (!matcher.matches())
+            return false;
+        if (token.equals(";"))
+            tokens.put(token, "Punto y Coma");
+        else if (token.equals("\""))
+            tokens.put(token, "Comillas");
+        else if (token.equals(","))
+            tokens.put(token, "Coma");
+        else
+            tokens.put(token, "Delimitador");
         token = "";
         return true;
     }
