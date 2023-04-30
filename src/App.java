@@ -26,7 +26,7 @@ public class App extends JFrame implements ActionListener {
     private File archivo;
     private int LineaCont = 1;
     private boolean isError = false;
-    private static Hashtable<String, String> tokens = new Hashtable<String, String>();
+    private static ArrayList<String[]> tokens = new ArrayList<>();
     private static String[] palabrasReservadas = {
             "program", "if", "else", "while", "for",
             "switch", "case", "break", "default",
@@ -134,9 +134,9 @@ public class App extends JFrame implements ActionListener {
                 return;
         }
         ArrayList<JLabel> labels = new ArrayList<JLabel>();
-        for (Entry<String, String> entry : tokens.entrySet()) {
-            labels.add(new JLabel(entry.getKey()));
-            labels.add(new JLabel(entry.getValue()));
+        for (String[] token : tokens) {
+            labels.add(new JLabel(token[0]));
+            labels.add(new JLabel(token[1]));
         }
         for (JLabel label : labels) {
             label.setMinimumSize(new Dimension(100, 30));
@@ -250,9 +250,10 @@ public class App extends JFrame implements ActionListener {
             return false;
         token = token.toLowerCase();
         if (Arrays.asList(palabrasReservadas).contains(token))
-            tokens.put(token, "Palabra reservada");
+            tokens.add(new String[] { token, "Palabra reservada" });
+
         else
-            tokens.put(token, "Identificador");
+            tokens.add(new String[] { token, "Identificador" });
         token = "";
         return true;
     }
@@ -262,7 +263,7 @@ public class App extends JFrame implements ActionListener {
         Matcher matcher = patron.matcher(token);
         if (!matcher.matches())
             return false;
-        tokens.put(token, "Operador Relacional");
+        tokens.add(new String[] { token, "Operador Relacional" });
         token = "";
         return true;
     }
@@ -272,7 +273,7 @@ public class App extends JFrame implements ActionListener {
         Matcher matcher = patron.matcher(token);
         if (!matcher.matches())
             return false;
-        tokens.put(token, "Numero");
+        tokens.add(new String[] { token, "numero" });
         token = "";
         return true;
     }
@@ -283,9 +284,9 @@ public class App extends JFrame implements ActionListener {
         if (!matcher.matches())
             return false;
         if (token.equals("="))
-            tokens.put(token, "Operador de Asignacion");
+            tokens.add(new String[] { token, "Operador de asignacion" });
         else
-            tokens.put(token, "Operador Aritmetico");
+            tokens.add(new String[] { token, "Operador Aritmetico" });
         token = "";
         return true;
     }
@@ -296,13 +297,13 @@ public class App extends JFrame implements ActionListener {
         if (!matcher.matches())
             return false;
         if (token.equals(";"))
-            tokens.put(token, "Punto y Coma");
+            tokens.add(new String[] { token, "Punto y coma" });
         else if (token.equals("\""))
-            tokens.put(token, "Comillas");
+            tokens.add(new String[] { token, "Comillas" });
         else if (token.equals(","))
-            tokens.put(token, "Coma");
+            tokens.add(new String[] { token, "Coma" });
         else
-            tokens.put(token, "Delimitador");
+            tokens.add(new String[] { token, "Delimitador" });
         token = "";
         return true;
     }
