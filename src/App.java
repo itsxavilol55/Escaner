@@ -8,8 +8,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Hashtable;
-import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.function.Predicate;
@@ -198,12 +196,19 @@ public class App extends JFrame implements ActionListener {
     }
 
     private void validarToken(String linea) {
-        String token = "";
+        String token = "", cadena = "";
         linea = linea.trim();
+        if (linea.contains("\"")) {
+            cadena = linea.replaceAll(".*\"([^\"]*)\".*", "$1 ");
+            cadena = cadena.replaceAll(" ", "_");
+            linea = linea.replaceAll("\"([^\"]*)\"", "\"" + cadena + "\"");
+        }
         linea = linea.replaceAll("(\\d+);", "$1 ;");// 0; -> 0 ;
         linea = linea.replaceAll("\"(\\S*)", "\" $1");// "texto -> " texto
         linea = linea.replaceAll("(\\S*)\"", "$1 \"");// texto" -> texto "
         linea = linea.replaceAll("\\(\"", "( \"");// (" -> ( "
+        linea = linea.replaceAll("\",", "\" ,");// ", -> " ,
+        linea = linea.replaceAll("\"\\)", "\" )");// ") -> " )
         linea = linea.replaceAll("([a-zA-Z]+)\\(", "$1 (");// texto( -> texto (
         linea = linea.replaceAll("(\\-\\-|\\+\\+|[a-zA-Z]{1}[a-zA-Z0-9]*)\\)", "$1 )");// ++) -> ++ )
         linea = linea.replaceAll("([a-zA-Z]{1}[a-zA-Z0-9]*)(\\-\\-|\\+\\+)", "$1 $2");// ID++ -> ID ++
@@ -218,6 +223,13 @@ public class App extends JFrame implements ActionListener {
             if (actual == ' ') {
                 String tokenAux = token;
                 token = "";
+                if (tokenAux.contains("_")) {
+                    cadena = cadena.replaceAll("_", " ");
+                    cadena = cadena.replaceAll("\"", "");
+                    tokens.add(new String[] { cadena, "Cadena" });
+                    tokenAux = "";
+                    continue;
+                }
                 boolean valido = false;
                 for (Predicate<String> validador : VALIDADORES)
                     if (validador.test(tokenAux)) {
@@ -251,7 +263,6 @@ public class App extends JFrame implements ActionListener {
         token = token.toLowerCase();
         if (Arrays.asList(palabrasReservadas).contains(token))
             tokens.add(new String[] { token, "Palabra reservada" });
-
         else
             tokens.add(new String[] { token, "Identificador" });
         token = "";
