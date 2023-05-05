@@ -1,4 +1,5 @@
 import java.awt.*;
+import javax.swing.event.*;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.event.*;
@@ -6,36 +7,17 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.function.Predicate;
-import java.util.List;
 
-public class App extends JFrame implements ActionListener {
+public class App extends JFrame implements ActionListener, MenuListener {
     private JMenuItem Nuevo, Abrir, Guardar;
-    private JTextArea txt;
+    static JTextArea txt;
     private JScrollPane scrollListado;
-    private JButton escanear;
-    private JPanel listado;
-    private JLabel error;
+    static JPanel listado;
+    static JLabel error;
+    private static JFrame panel;
     private Font fuente = new Font("Tahoma", 16, 15);
     private File archivo;
-    private int LineaCont = 1;
-    private boolean isError = false;
-    private static ArrayList<String[]> tokens = new ArrayList<>();
-    private static String[] palabrasReservadas = {
-            "program", "if", "else", "while", "for",
-            "switch", "case", "break", "default",
-            "return", "int", "leerdato", "imprimir" };
-    private static final List<Predicate<String>> VALIDADORES = Arrays.asList(
-            App::validaComentario,
-            App::validaID,
-            App::validaOprel,
-            App::validaNumero,
-            App::validaAritmeticos,
-            App::validaDelimitadores);
+    private JMenu Escaner, Parser;
 
     public static void main(String[] args) throws Exception {
         new App();
@@ -47,8 +29,9 @@ public class App extends JFrame implements ActionListener {
     }
 
     private void interfaz() {
+        panel = this;
         setTitle("Supra");
-        setSize(1000, 800);
+        setSize(1200, 800);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setResizable(false);
@@ -56,19 +39,19 @@ public class App extends JFrame implements ActionListener {
         JLabel label = new JLabel("Listado de Tokens");
         JMenuBar BarraPrincipal = new JMenuBar();
         JMenu MenuArchivo = new JMenu("Archivo");
+        Escaner = new JMenu("Escaner");
+        Parser = new JMenu("Parser");
         error = new JLabel("");
         listado = new JPanel();
         txt = new JTextArea();
         scrollListado = new JScrollPane(listado);
-        escanear = new JButton("Escanear");// Agregar botones y menu
-        Nuevo = new JMenuItem("Nuevo");
+        Nuevo = new JMenuItem("Nuevo"); // Agregar botones y menu
         Abrir = new JMenuItem("Abrir");
         Guardar = new JMenuItem("Guardar");
         {
-            escanear.setBounds(160, 580, 120, 40);
-            label.setBounds(500, 25, 200, 10);
-            scrollListado.setBounds(500, 50, 480, 500);
-            txt.setBounds(20, 50, 450, 500);
+            label.setBounds(600, 25, 200, 10);
+            scrollListado.setBounds(600, 50, 570, 600);
+            txt.setBounds(20, 50, 550, 600);
             error.setBounds(20, 650, 2600, 30);
         }
         txt.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -81,9 +64,10 @@ public class App extends JFrame implements ActionListener {
         MenuArchivo.add(Abrir);
         MenuArchivo.add(Guardar);
         BarraPrincipal.add(MenuArchivo);
+        BarraPrincipal.add(Escaner);
+        BarraPrincipal.add(Parser);
         setJMenuBar(BarraPrincipal);
         add(txt);
-        add(escanear);
         add(label);
         add(scrollListado);
         add(error);
@@ -91,18 +75,15 @@ public class App extends JFrame implements ActionListener {
     }
 
     private void eventos() {
-        escanear.addActionListener(this);
         Nuevo.addActionListener(this);
         Abrir.addActionListener(this);
         Guardar.addActionListener(this);
+        Escaner.addMenuListener(this);
+        Parser.addActionListener(this);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == escanear) {
-            escanear();
-            return;
-        }
         if (e.getSource() == Nuevo) {
             txt.setText("");
             Limpiar();
@@ -118,35 +99,12 @@ public class App extends JFrame implements ActionListener {
         }
     }
 
-    private void escanear() {
-        LineaCont = 1;
-        isError = false;
-        tokens.clear();
-        Limpiar();
-        error.setText("");
-        String[] lineas = txt.getText().split("\\r?\\n");
-        for (String linea : lineas) {
-            validarToken(linea);
-            LineaCont++;
-            if (isError)
-                return;
+    @Override
+    public void menuSelected(MenuEvent e) {
+        if (e.getSource() == Escaner) {
+            Scanner.escanear();
+            return;
         }
-        ArrayList<JLabel> labels = new ArrayList<JLabel>();
-        for (String[] token : tokens) {
-            labels.add(new JLabel(token[0]));
-            labels.add(new JLabel(token[1]));
-        }
-        for (JLabel label : labels) {
-            label.setMinimumSize(new Dimension(100, 30));
-            label.setMaximumSize(new Dimension(100, 30));
-            label.setPreferredSize(new Dimension(100, 30));
-            label.setFont(fuente);
-            listado.add(label);
-        }
-        error.setText("");
-        revalidate();
-        validate();
-        listado.update(listado.getGraphics());
     }
 
     private void Abrir() {
@@ -195,141 +153,23 @@ public class App extends JFrame implements ActionListener {
         }
     }
 
-    private void validarToken(String linea) {
-        String token = "", cadena = "";
-        linea = linea.trim();
-        if (linea.contains("\"")) {
-            cadena = linea.replaceAll(".*\"([^\"]*)\".*", "$1 ");
-            cadena = cadena.replaceAll(" ", "_");
-            linea = linea.replaceAll("\"([^\"]*)\"", "\"" + cadena + "\"");
-        }
-        linea = linea.replaceAll("(\\d+);", "$1 ;");// 0; -> 0 ;
-        linea = linea.replaceAll("\"(\\S*)", "\" $1");// "texto -> " texto
-        linea = linea.replaceAll("(\\S*)\"", "$1 \"");// texto" -> texto "
-        linea = linea.replaceAll("\\(\"", "( \"");// (" -> ( "
-        linea = linea.replaceAll("\",", "\" ,");// ", -> " ,
-        linea = linea.replaceAll("\"\\)", "\" )");// ") -> " )
-        linea = linea.replaceAll("([a-zA-Z]+)\\(", "$1 (");// texto( -> texto (
-        linea = linea.replaceAll("(\\-\\-|\\+\\+|[a-zA-Z]{1}[a-zA-Z0-9]*)\\)", "$1 )");// ++) -> ++ )
-        linea = linea.replaceAll("([a-zA-Z]{1}[a-zA-Z0-9]*)(\\-\\-|\\+\\+)", "$1 $2");// ID++ -> ID ++
-        linea = linea.replaceAll("(\\()([a-zA-Z]+|\\))", "$1 $2");// (texto -> ( texto
-        linea = linea.replaceAll("\\s{2,}", " ");// elimina 2 o mas espacios y deja uno solo
-        linea += " ";
-        int length = linea.length();
-        if (length == 1)
-            return;
-        for (int i = 0; i < length; i++) {
-            char actual = linea.charAt(i);
-            if (actual == ' ') {
-                String tokenAux = token;
-                token = "";
-                if (tokenAux.contains("_")) {
-                    cadena = cadena.replaceAll("_", " ");
-                    cadena = cadena.replaceAll("\"", "");
-                    tokens.add(new String[] { cadena, "Cadena" });
-                    tokenAux = "";
-                    continue;
-                }
-                boolean valido = false;
-                for (Predicate<String> validador : VALIDADORES)
-                    if (validador.test(tokenAux)) {
-                        valido = true;
-                        break;
-                    }
-                if (!valido) {
-                    mensajeError("No es un token valido: '" + tokenAux + "'");
-                    return;
-                }
-                continue;
-            }
-            token += actual;
-        }
-    }
-
-    private static boolean validaComentario(String token) {
-        Pattern patron = Pattern.compile("\\/\\/.*");
-        Matcher matcher = patron.matcher(token);
-        if (!matcher.matches())
-            return false;
-        token = "";
-        return true;
-    }
-
-    private static boolean validaID(String token) {
-        Pattern patron = Pattern.compile("[a-zA-Z]{1}[a-zA-Z0-9]*");
-        Matcher matcher = patron.matcher(token);
-        if (!matcher.matches())
-            return false;
-        token = token.toLowerCase();
-        if (Arrays.asList(palabrasReservadas).contains(token))
-            tokens.add(new String[] { token, "Palabra reservada" });
-        else
-            tokens.add(new String[] { token, "Identificador" });
-        token = "";
-        return true;
-    }
-
-    private static boolean validaOprel(String token) {
-        Pattern patron = Pattern.compile("(==|!=|<|<=|>|>=){1}");
-        Matcher matcher = patron.matcher(token);
-        if (!matcher.matches())
-            return false;
-        tokens.add(new String[] { token, "Operador Relacional" });
-        token = "";
-        return true;
-    }
-
-    private static boolean validaNumero(String token) {
-        Pattern patron = Pattern.compile("-?[0-9]+\\.?[0-9]*");
-        Matcher matcher = patron.matcher(token);
-        if (!matcher.matches())
-            return false;
-        tokens.add(new String[] { token, "numero" });
-        token = "";
-        return true;
-    }
-
-    private static boolean validaAritmeticos(String token) {
-        Pattern patron = Pattern.compile("(\\+|\\-|\\/|\\*|\\^|\\%|\\+\\+|\\-\\-|=){1}");
-        Matcher matcher = patron.matcher(token);
-        if (!matcher.matches())
-            return false;
-        if (token.equals("="))
-            tokens.add(new String[] { token, "Operador de asignacion" });
-        else
-            tokens.add(new String[] { token, "Operador Aritmetico" });
-        token = "";
-        return true;
-    }
-
-    private static boolean validaDelimitadores(String token) {
-        Pattern patron = Pattern.compile("(\\{|\\}|\\(|\\)|\\[|\\]|;|\"|,){1}");
-        Matcher matcher = patron.matcher(token);
-        if (!matcher.matches())
-            return false;
-        if (token.equals(";"))
-            tokens.add(new String[] { token, "Punto y coma" });
-        else if (token.equals("\""))
-            tokens.add(new String[] { token, "Comillas" });
-        else if (token.equals(","))
-            tokens.add(new String[] { token, "Coma" });
-        else
-            tokens.add(new String[] { token, "Delimitador" });
-        token = "";
-        return true;
-    }
-
-    private void mensajeError(String mensaje) {
-        isError = true;
-        error.setText(mensaje + " -Linea: " + LineaCont);
-        tokens.clear();
-        Limpiar();
-    }
-
-    private void Limpiar() {
+    static void Limpiar() {
         listado.removeAll();
-        revalidate();
-        validate();
+        valida();
         listado.update(listado.getGraphics());
+    }
+
+    static void valida() {
+        panel.revalidate();
+        panel.validate();
+    }
+
+    @Override
+    public void menuDeselected(MenuEvent e) {
+
+    }
+
+    @Override
+    public void menuCanceled(MenuEvent e) {
     }
 }
