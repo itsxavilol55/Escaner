@@ -2,6 +2,7 @@ import java.awt.*;
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Hashtable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.function.Predicate;
@@ -11,7 +12,7 @@ public class Scanner {
     private static Font fuente = new Font("Tahoma", 16, 15);
     private static int LineaCont = 1;
     private static boolean isError = false;
-    private static ArrayList<String[]> tokens = new ArrayList<>();
+    static ArrayList<String[]> tokens = new ArrayList<>();
     private static String[] palabrasReservadas = {
             "program", "if", "else", "while", "for",
             "switch", "case", "break", "default",
@@ -23,8 +24,18 @@ public class Scanner {
             Scanner::validaNumero,
             Scanner::validaAritmeticos,
             Scanner::validaDelimitadores);
+    static Hashtable<String, String> symbols = new Hashtable<String, String>();
 
     static void escanear() {
+        symbols.put("{", "left_curly_bracket");
+        symbols.put("}", "right_curly_bracket");
+        symbols.put("(", "left_parenthesis");
+        symbols.put(")", "right_parenthesis");
+        symbols.put("[", "left_square_bracket");
+        symbols.put("]", "right_square_bracket");
+        symbols.put(";", "semicolon");
+        symbols.put("\"", "double_quote");
+        symbols.put(",", "comma");
         LineaCont = 1;
         isError = false;
         tokens.clear();
@@ -166,14 +177,7 @@ public class Scanner {
         Matcher matcher = patron.matcher(token);
         if (!matcher.matches())
             return false;
-        if (token.equals(";"))
-            tokens.add(new String[] { token, "Punto y coma" });
-        else if (token.equals("\""))
-            tokens.add(new String[] { token, "Comillas" });
-        else if (token.equals(","))
-            tokens.add(new String[] { token, "Coma" });
-        else
-            tokens.add(new String[] { token, "Delimitador" });
+        tokens.add(new String[] { token, symbols.get(token) });
         token = "";
         return true;
     }

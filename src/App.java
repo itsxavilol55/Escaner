@@ -1,5 +1,4 @@
 import java.awt.*;
-import javax.swing.event.*;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.event.*;
@@ -8,7 +7,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class App extends JFrame implements ActionListener, MenuListener {
+public class App extends JFrame implements ActionListener, MouseListener {
     private JMenuItem Nuevo, Abrir, Guardar;
     static JTextArea txt;
     private JScrollPane scrollListado;
@@ -17,7 +16,7 @@ public class App extends JFrame implements ActionListener, MenuListener {
     private static JFrame panel;
     private Font fuente = new Font("Tahoma", 16, 15);
     private File archivo;
-    private JMenu Escaner, Parser;
+    private JMenu Escaner, parser;
 
     public static void main(String[] args) throws Exception {
         new App();
@@ -40,7 +39,7 @@ public class App extends JFrame implements ActionListener, MenuListener {
         JMenuBar BarraPrincipal = new JMenuBar();
         JMenu MenuArchivo = new JMenu("Archivo");
         Escaner = new JMenu("Escaner");
-        Parser = new JMenu("Parser");
+        parser = new JMenu("Parser");
         error = new JLabel("");
         listado = new JPanel();
         txt = new JTextArea();
@@ -65,7 +64,7 @@ public class App extends JFrame implements ActionListener, MenuListener {
         MenuArchivo.add(Guardar);
         BarraPrincipal.add(MenuArchivo);
         BarraPrincipal.add(Escaner);
-        BarraPrincipal.add(Parser);
+        BarraPrincipal.add(parser);
         setJMenuBar(BarraPrincipal);
         add(txt);
         add(label);
@@ -78,8 +77,8 @@ public class App extends JFrame implements ActionListener, MenuListener {
         Nuevo.addActionListener(this);
         Abrir.addActionListener(this);
         Guardar.addActionListener(this);
-        Escaner.addMenuListener(this);
-        Parser.addActionListener(this);
+        Escaner.addMouseListener(this);
+        parser.addMouseListener(this);
     }
 
     @Override
@@ -100,9 +99,13 @@ public class App extends JFrame implements ActionListener, MenuListener {
     }
 
     @Override
-    public void menuSelected(MenuEvent e) {
+    public void mouseClicked(MouseEvent e) {
         if (e.getSource() == Escaner) {
             Scanner.escanear();
+            return;
+        }
+        if (e.getSource() == parser) {
+            Parser.Parsear();
             return;
         }
     }
@@ -165,11 +168,22 @@ public class App extends JFrame implements ActionListener, MenuListener {
     }
 
     @Override
-    public void menuDeselected(MenuEvent e) {
+    public void mousePressed(MouseEvent e) {
 
     }
 
     @Override
-    public void menuCanceled(MenuEvent e) {
+    public void mouseReleased(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+
     }
 }
