@@ -73,7 +73,7 @@ public class Scanner {
             cadena = cadena.replaceAll(" ", "_");
             linea = linea.replaceAll("\"([^\"]*)\"", "\"" + cadena + "\"");
         }
-        linea = linea.replaceAll("(\\d+);", "$1 ;");// 0; -> 0 ;
+        linea = linea.replaceAll("(.);", "$1 ;");// 0; -> 0 ;
         linea = linea.replaceAll("\"(\\S*)", "\" $1");// "texto -> " texto
         linea = linea.replaceAll("(\\S*)\"", "$1 \"");// texto" -> texto "
         linea = linea.replaceAll("\\(\"", "( \"");// (" -> ( "

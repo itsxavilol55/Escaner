@@ -35,6 +35,9 @@ public class Parser {
         cont++;
         if (!asig(lista.get(cont)[1]))
             return;
+        cont++;
+        if (!lista.get(cont)[1].equals("right_curly_bracket"))
+            return;
         valido = true;
     }
 
@@ -45,9 +48,7 @@ public class Parser {
         if (!lista.get(cont)[0].equals("="))
             return false;
         cont++;
-        if (!(lista.get(cont)[1].equals("Identificador") ||
-                lista.get(cont)[1].equals("numero") ||
-                !calc(lista.get(cont)[1])))
+        if (!calc(lista.get(cont)[1]))
             return false;
         return true;
     }
@@ -57,12 +58,21 @@ public class Parser {
                 lista.get(cont)[1].equals("numero")))
             return false;
         cont++;
-        if (!(lista.get(cont)[1].equals("Operador Aritmetico")))
+        if ((lista.get(cont)[0].equals(";")))
+            return true;
+        if (!(lista.get(cont)[1].equals("Operador Aritmetico"))) {
+            cont--;
             return false;
+        }
         cont++;
         if (!(lista.get(cont)[1].equals("Identificador") ||
-                lista.get(cont)[1].equals("numero")))
+                lista.get(cont)[1].equals("numero"))) {
+            cont--;
             return false;
-        return true;
+        }
+        cont++;
+        if ((lista.get(cont)[0].equals(";")))
+            return true;
+        return false;
     }
 }
