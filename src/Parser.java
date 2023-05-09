@@ -12,7 +12,7 @@ public class Parser {
         lista = Scanner.tokens;
         if (lista.size() == 0)
             return;
-        program(lista.get(0)[0]);
+        program();
         if (!valido) {
             JOptionPane.showMessageDialog(null, "El Programa no es correcto");
             return;
@@ -20,41 +20,50 @@ public class Parser {
         JOptionPane.showMessageDialog(null, "El Programa es correcto");
     }
 
-    private static void program(String token) {
-        if (!token.equals("program"))
+    private static void program() {
+        if (!lista.get(0)[0].equals("program"))
             return;
         cont++;
         if (!lista.get(cont)[1].equals("Identificador"))
             return;
         cont++;
-        bloque(lista.get(cont)[1]);
+        bloque();
     }
 
-    private static void bloque(String token) {
-        if (!token.equals("left_curly_bracket"))
+    private static void bloque() {
+        if (!lista.get(cont)[1].equals("left_curly_bracket"))
             return;
         cont++;
-        if (!asig(lista.get(cont)[1]))
+        if (!instr())
             return;
-        cont++;
         if (!lista.get(cont)[1].equals("right_curly_bracket"))
             return;
         valido = true;
     }
 
-    private static boolean asig(String token) {
-        if (!token.equals("Identificador"))
+    private static boolean instr() {
+        if (!asig())
+            return false;
+        cont++;
+        if (!lista.get(cont)[1].equals("right_curly_bracket"))
+            return instr();
+        else
+            return true;
+    }
+
+    private static boolean asig() {
+        if (!lista.get(cont)[1].equals("Identificador"))
             return false;
         cont++;
         if (!lista.get(cont)[0].equals("="))
             return false;
         cont++;
-        if (!calc(lista.get(cont)[1]))
+        if (!calc())
             return false;
         return true;
     }
 
-    private static boolean calc(String string) {
+    private static boolean calc() {
         if (!(lista.get(cont)[1].equals("Identificador") ||
                 lista.get(cont)[1].equals("numero")))
             return false;
