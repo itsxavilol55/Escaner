@@ -9,7 +9,7 @@ import java.util.function.Predicate;
 import java.util.List;
 
 public class Scanner {
-    private static Font fuente = new Font("Tahoma", 16, 15);
+    private static Font fuente = new Font("Tahoma", 16, 17);
     private static int LineaCont = 1;
     private static boolean isError = false;
     static ArrayList<String[]> tokens = new ArrayList<>();

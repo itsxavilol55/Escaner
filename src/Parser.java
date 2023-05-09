@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
 
 public class Parser {
     private static int cont;
@@ -13,10 +14,10 @@ public class Parser {
             return;
         program(lista.get(0)[0]);
         if (!valido) {
-            System.out.println("Eso esta mal");
+            JOptionPane.showMessageDialog(null, "El Programa no es correcto");
             return;
         }
-        System.out.println("Eso esta bien");
+        JOptionPane.showMessageDialog(null, "El Programa es correcto");
     }
 
     private static void program(String token) {

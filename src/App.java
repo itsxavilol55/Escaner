@@ -14,7 +14,7 @@ public class App extends JFrame implements ActionListener, MouseListener {
     static JPanel listado;
     static JLabel error;
     private static JFrame panel;
-    private Font fuente = new Font("Tahoma", 16, 17);
+    private Font fuente = new Font("Tahoma", 16, 18);
     private File archivo;
     private JMenu Escaner, parser;
 
