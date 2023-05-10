@@ -50,8 +50,10 @@ public class Parser {
     }
 
     private static boolean instr() {
-        if (!asig())
+        System.out.println("inicio" + cont);
+        if (!(asig() || leer()))
             return false;
+        System.out.println("final" + cont);
         cont++;
         if (!lista.get(cont)[1].equals("right_curly_bracket"))
             return instr();
@@ -59,12 +61,35 @@ public class Parser {
             return true;
     }
 
-    private static boolean asig() {
+    private static boolean leer() {
         if (!lista.get(cont)[1].equals("Identificador"))
             return false;
         cont++;
         if (!lista.get(cont)[0].equals("="))
             return false;
+        cont++;
+        if (!lista.get(cont)[0].equals("leerdato"))
+            return false;
+        cont++;
+        if (!lista.get(cont)[1].equals("left_parenthesis"))
+            return false;
+        cont++;
+        if (!lista.get(cont)[1].equals("right_parenthesis"))
+            return false;
+        cont++;
+        if (lista.get(cont)[0].equals(";"))
+            return true;
+        return false;
+    }
+
+    private static boolean asig() {
+        if (!lista.get(cont)[1].equals("Identificador"))
+            return false;
+        cont++;
+        if (!lista.get(cont)[0].equals("=")) {
+            cont--;
+            return false;
+        }
         cont++;
         if (!calc())
             return false;
@@ -73,10 +98,12 @@ public class Parser {
 
     private static boolean calc() {
         if (!(lista.get(cont)[1].equals("Identificador") ||
-                lista.get(cont)[1].equals("numero")))
+                lista.get(cont)[1].equals("numero"))) {
+            cont -= 2;
             return false;
+        }
         cont++;
-        if ((lista.get(cont)[0].equals(";")))
+        if (lista.get(cont)[0].equals(";"))
             return true;
         if (!(lista.get(cont)[1].equals("Operador Aritmetico"))) {
             cont--;
@@ -89,8 +116,9 @@ public class Parser {
             return false;
         }
         cont++;
-        if ((lista.get(cont)[0].equals(";")))
+        if (lista.get(cont)[0].equals(";"))
             return true;
+        cont *= -1;
         return false;
     }
 }
