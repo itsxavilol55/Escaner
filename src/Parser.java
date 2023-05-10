@@ -12,7 +12,11 @@ public class Parser {
         lista = Scanner.tokens;
         if (lista.size() == 0)
             return;
-        program();
+        try {
+            program();
+        } catch (Exception e) {
+
+        }
         if (!valido) {
             JOptionPane.showMessageDialog(null, "El Programa no es correcto");
             return;
@@ -27,18 +31,22 @@ public class Parser {
         if (!lista.get(cont)[1].equals("Identificador"))
             return;
         cont++;
-        bloque();
-    }
-
-    private static void bloque() {
-        if (!lista.get(cont)[1].equals("left_curly_bracket"))
+        if (!bloque())
             return;
-        cont++;
-        if (!instr())
-            return;
-        if (!lista.get(cont)[1].equals("right_curly_bracket"))
+        if (cont != lista.size() - 1)
             return;
         valido = true;
+    }
+
+    private static boolean bloque() {
+        if (!lista.get(cont)[1].equals("left_curly_bracket"))
+            return false;
+        cont++;
+        if (!instr())
+            return false;
+        if (!lista.get(cont)[1].equals("right_curly_bracket"))
+            return false;
+        return true;
     }
 
     private static boolean instr() {
