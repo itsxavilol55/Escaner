@@ -96,7 +96,7 @@ public class Scanner {
                 if (tokenAux.contains("_")) {
                     cadena = cadena.replaceAll("_", " ");
                     cadena = cadena.replaceAll("\"", "");
-                    tokens.add(new String[] { cadena, "Cadena" });
+                    tokens.add(new String[] { cadena, "cadena" });
                     tokenAux = "";
                     continue;
                 }

@@ -50,15 +50,52 @@ public class Parser {
     }
 
     private static boolean instr() {
-        System.out.println("inicio" + cont);
-        if (!(asig() || leer()))
+        if (!(asig() || leer() || impr()))
             return false;
-        System.out.println("final" + cont);
         cont++;
         if (!lista.get(cont)[1].equals("right_curly_bracket"))
             return instr();
         else
             return true;
+    }
+
+    private static boolean impr() {
+        if (!lista.get(cont)[0].equals("imprimir"))
+            return false;
+        cont++;
+        if (!lista.get(cont)[1].equals("left_parenthesis"))
+            return false;
+        cont++;
+        if (lista.get(cont)[1].equals("Identificador")) {
+            cont++;
+            if (!lista.get(cont)[1].equals("right_parenthesis"))
+                return false;
+            cont++;
+            if (lista.get(cont)[0].equals(";"))
+                return true;
+            return false;
+        }
+        if (!lista.get(cont)[0].equals("\""))
+            return false;
+        cont++;
+        if (!lista.get(cont)[1].equals("cadena"))
+            return false;
+        cont++;
+        if (!lista.get(cont)[0].equals("\""))
+            return false;
+        cont++;
+        if (!lista.get(cont)[1].equals("comma"))
+            return false;
+        cont++;
+        if (!lista.get(cont)[1].equals("Identificador"))
+            return false;
+        cont++;
+        if (!lista.get(cont)[1].equals("right_parenthesis"))
+            return false;
+        cont++;
+        if (lista.get(cont)[0].equals(";"))
+            return true;
+        return false;
     }
 
     private static boolean leer() {
