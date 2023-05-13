@@ -87,8 +87,11 @@ public class Scanner {
         linea = linea.replaceAll("\\s{2,}", " ");// elimina 2 o mas espacios y deja uno solo
         linea += " ";
         int length = linea.length();
-        if (length <= 1)
+        if (length <= 1) {
+            App.error.setForeground(Color.red);
+            App.error.setText("El Programa esta vacio");
             return;
+        }
         for (int i = 0; i < length; i++) {
             char actual = linea.charAt(i);
             if (actual == ' ') {

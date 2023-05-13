@@ -1,0 +1,17 @@
+Program Ejemplo1
+{
+      for(contador = 0; contador < 4; contador++)
+      {
+           imprimir("Escribe un numero");
+           n = leerDato();
+           if(n > mayor)
+          {	
+	x = s + 5;
+            }
+            else 
+             {	
+	x = s - 5;
+            }
+      }
+       imprimir("el numero mayor es ", mayor);
+}

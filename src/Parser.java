@@ -10,8 +10,11 @@ public class Parser {
         cont = 0;
         valido = false;
         lista = Scanner.tokens;
-        if (lista.size() == 0)
+        if (lista.size() == 0) {
+            App.error.setForeground(Color.red);
+            App.error.setText("No se puede hacer parser sin hacer el Escaner");
             return;
+        }
         try {
             program();
         } catch (Exception e) {
@@ -52,13 +55,44 @@ public class Parser {
     }
 
     private static boolean instr() {
-        if (!(asig() || leer() || impr() || si()))
+        if (!(asig() || leer() || impr() || si() || ciclo()))
             return false;
         cont++;
         if (!lista.get(cont)[1].equals("right_curly_bracket"))
             return instr();
         else
             return true;
+    }
+
+    private static boolean ciclo() {
+        if (!lista.get(cont)[0].equals("for"))
+            return false;
+        cont++;
+        if (!lista.get(cont)[1].equals("left_parenthesis"))
+            return false;
+        cont++;
+        if (!asig())
+            return false;
+        cont++;
+        if (!cond())
+            return false;
+        cont++;
+        if (!lista.get(cont)[0].equals(";"))
+            return false;
+        cont++;
+        if (!lista.get(cont)[1].equals("Identificador"))
+            return false;
+        cont++;
+        if (!(lista.get(cont)[0].equals("++") ||
+                lista.get(cont)[0].equals("--")))
+            return false;
+        cont++;
+        if (!lista.get(cont)[1].equals("right_parenthesis"))
+            return false;
+        cont++;
+        if (!bloque())
+            return false;
+        return true;
     }
 
     private static boolean si() {
@@ -127,6 +161,12 @@ public class Parser {
         if (!lista.get(cont)[0].equals("\""))
             return false;
         cont++;
+        if (lista.get(cont)[1].equals("right_parenthesis")) {
+            cont++;
+            if (lista.get(cont)[0].equals(";"))
+                return true;
+            return false;
+        }
         if (!lista.get(cont)[1].equals("comma"))
             return false;
         cont++;
