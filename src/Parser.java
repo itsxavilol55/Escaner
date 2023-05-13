@@ -1,5 +1,5 @@
+import java.awt.Color;
 import java.util.ArrayList;
-import javax.swing.JOptionPane;
 
 public class Parser {
     private static int cont;
@@ -18,10 +18,12 @@ public class Parser {
 
         }
         if (!valido) {
-            JOptionPane.showMessageDialog(null, "El Programa no es correcto");
+            App.error.setForeground(Color.red);
+            App.error.setText("El programa no es correcto");
             return;
         }
-        JOptionPane.showMessageDialog(null, "El Programa es correcto");
+        App.error.setForeground(Color.green);
+        App.error.setText("El programa es Correcto");
     }
 
     private static void program() {
@@ -50,13 +52,54 @@ public class Parser {
     }
 
     private static boolean instr() {
-        if (!(asig() || leer() || impr()))
+        if (!(asig() || leer() || impr() || si()))
             return false;
         cont++;
         if (!lista.get(cont)[1].equals("right_curly_bracket"))
             return instr();
         else
             return true;
+    }
+
+    private static boolean si() {
+        if (!lista.get(cont)[0].equals("if"))
+            return false;
+        cont++;
+        if (!lista.get(cont)[1].equals("left_parenthesis"))
+            return false;
+        cont++;
+        if (!cond())
+            return false;
+        cont++;
+        if (!lista.get(cont)[1].equals("right_parenthesis"))
+            return false;
+        cont++;
+        if (!bloque())
+            return false;
+        cont++;
+        if (lista.get(cont)[0].equals("else")) {
+            cont++;
+            if (!bloque())
+                return false;
+        } else
+            cont--;
+        return true;
+    }
+
+    private static boolean cond() {
+        if (!(lista.get(cont)[1].equals("Identificador") ||
+                lista.get(cont)[1].equals("numero"))) {
+            return false;
+        }
+        cont++;
+        if (!lista.get(cont)[1].equals("Operador Relacional"))
+            return false;
+        cont++;
+        if (!(lista.get(cont)[1].equals("Identificador") ||
+                lista.get(cont)[1].equals("numero"))) {
+            return false;
+        }
+        return true;
     }
 
     private static boolean impr() {

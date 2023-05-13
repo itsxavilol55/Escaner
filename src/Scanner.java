@@ -9,7 +9,7 @@ import java.util.function.Predicate;
 import java.util.List;
 
 public class Scanner {
-    private static Font fuente = new Font("Tahoma", 16, 17);
+    private static Font fuente = new Font("Tahoma", 16, 22);
     private static int LineaCont = 1;
     private static boolean isError = false;
     static ArrayList<String[]> tokens = new ArrayList<>();
@@ -79,6 +79,7 @@ public class Scanner {
         linea = linea.replaceAll("\\(\"", "( \"");// (" -> ( "
         linea = linea.replaceAll("\",", "\" ,");// ", -> " ,
         linea = linea.replaceAll("\"\\)", "\" )");// ") -> " )
+        linea = linea.replaceAll("([0-9])\\)", "$1 )");// ") -> " )
         linea = linea.replaceAll("([a-zA-Z]+)\\(", "$1 (");// texto( -> texto (
         linea = linea.replaceAll("(\\-\\-|\\+\\+|[a-zA-Z]{1}[a-zA-Z0-9]*)\\)", "$1 )");// ++) -> ++ )
         linea = linea.replaceAll("([a-zA-Z]{1}[a-zA-Z0-9]*)(\\-\\-|\\+\\+)", "$1 $2");// ID++ -> ID ++
@@ -184,6 +185,7 @@ public class Scanner {
 
     private static void mensajeError(String mensaje) {
         isError = true;
+        App.error.setForeground(Color.red);
         App.error.setText(mensaje + " -Linea: " + LineaCont);
         tokens.clear();
         App.Limpiar();

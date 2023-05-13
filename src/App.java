@@ -14,7 +14,8 @@ public class App extends JFrame implements ActionListener, MouseListener {
     static JPanel listado;
     static JLabel error;
     private static JFrame panel;
-    private Font fuente = new Font("Tahoma", 16, 18);
+    private Font fuente = new Font("Tahoma", 16, 20);
+    private Font fuente2 = new Font("Tahoma", 16, 15);
     private File archivo;
     private JMenu Escaner, parser;
 
@@ -51,11 +52,16 @@ public class App extends JFrame implements ActionListener, MouseListener {
             label.setBounds(600, 25, 200, 10);
             scrollListado.setBounds(600, 50, 570, 600);
             txt.setBounds(20, 50, 550, 600);
-            error.setBounds(20, 650, 2600, 30);
+            error.setBounds(20, 650, 550, 30);
         }
         txt.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         txt.setFont(fuente);
+        Escaner.setFont(fuente2);
+        parser.setFont(fuente2);
+        MenuArchivo.setFont(fuente2);
+        error.setOpaque(true);
         error.setFont(fuente);
+        error.setBackground(Color.white);
         error.setForeground(Color.red);
         listado.setLayout(new GridLayout(0, 2));
         listado.setAlignmentY(Component.TOP_ALIGNMENT);
