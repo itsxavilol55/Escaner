@@ -16,7 +16,8 @@ public class Scanner {
     private static String[] palabrasReservadas = {
             "program", "if", "else", "while", "for",
             "switch", "case", "break", "default",
-            "return", "int", "leerdato", "imprimir" };
+            "return", "leerdato", "imprimir" };
+    private static String[] tipoDato = { "int", "double", "boolean", "string" };
     private static final List<Predicate<String>> VALIDADORES = Arrays.asList(
             Scanner::validaComentario,
             Scanner::validaID,
@@ -137,6 +138,8 @@ public class Scanner {
         token = token.toLowerCase();
         if (Arrays.asList(palabrasReservadas).contains(token))
             tokens.add(new String[] { token, "Palabra reservada" });
+        else if (Arrays.asList(tipoDato).contains(token))
+            tokens.add(new String[] { token, "Tipo de Dato" });
         else
             tokens.add(new String[] { token, "Identificador" });
         token = "";
