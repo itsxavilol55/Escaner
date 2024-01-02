@@ -55,13 +55,20 @@ public class Parser {
     }
 
     private static boolean instr() {
-        if (!(asig() || leer() || impr() || si() || ciclo()))
+        if (!(asig() || declarar() || leer() || impr() || si() || ciclo()))
             return false;
         cont++;
         if (!lista.get(cont)[1].equals("right_curly_bracket"))
             return instr();
         else
             return true;
+    }
+
+    private static boolean declarar() {
+        if (!lista.get(cont)[1].equals("Tipo de Dato"))
+            return false;
+        cont++;
+        return asig();
     }
 
     private static boolean ciclo() {
