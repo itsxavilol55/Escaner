@@ -55,7 +55,7 @@ public class Parser {
     }
 
     private static boolean instr() {
-        if (!(asig() || declarar() || leer() || impr() || si() || ciclo()))
+        if (!(asig() || declarar() || impr() || si() || ciclo()))
             return false;
         cont++;
         if (!lista.get(cont)[1].equals("right_curly_bracket"))
@@ -188,13 +188,21 @@ public class Parser {
         return false;
     }
 
-    private static boolean leer() {
+    private static boolean asig() {
         if (!lista.get(cont)[1].equals("Identificador"))
             return false;
         cont++;
-        if (!lista.get(cont)[0].equals("="))
+        if (!lista.get(cont)[0].equals("=")) {
+            cont--;
             return false;
+        }
         cont++;
+        if (!(calc() || cadena() || leer()))
+            return false;
+        return true;
+    }
+
+    private static boolean leer() {
         if (!lista.get(cont)[0].equals("leerdato"))
             return false;
         cont++;
@@ -207,20 +215,6 @@ public class Parser {
         if (lista.get(cont)[0].equals(";"))
             return true;
         return false;
-    }
-
-    private static boolean asig() {
-        if (!lista.get(cont)[1].equals("Identificador"))
-            return false;
-        cont++;
-        if (!lista.get(cont)[0].equals("=")) {
-            cont--;
-            return false;
-        }
-        cont++;
-        if (!(calc() || cadena()))
-            return false;
-        return true;
     }
 
     private static boolean cadena() {
@@ -241,7 +235,6 @@ public class Parser {
     private static boolean calc() {
         if (!(lista.get(cont)[1].equals("Identificador") ||
                 lista.get(cont)[1].equals("numero"))) {
-            // cont -= 2;
             return false;
         }
         cont++;
