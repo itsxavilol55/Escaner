@@ -218,15 +218,30 @@ public class Parser {
             return false;
         }
         cont++;
-        if (!calc())
+        if (!(calc() || cadena()))
             return false;
         return true;
+    }
+
+    private static boolean cadena() {
+        if (!lista.get(cont)[0].equals("\""))
+            return false;
+        cont++;
+        if (!lista.get(cont)[1].equals("cadena"))
+            return false;
+        cont++;
+        if (!lista.get(cont)[0].equals("\""))
+            return false;
+        cont++;
+        if (lista.get(cont)[0].equals(";"))
+            return true;
+        return false;
     }
 
     private static boolean calc() {
         if (!(lista.get(cont)[1].equals("Identificador") ||
                 lista.get(cont)[1].equals("numero"))) {
-            cont -= 2;
+            // cont -= 2;
             return false;
         }
         cont++;
