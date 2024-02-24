@@ -17,7 +17,7 @@ public class App extends JFrame implements ActionListener, MouseListener {
     private Font fuente = new Font("Tahoma", 16, 20);
     private Font fuente2 = new Font("Tahoma", 16, 15);
     private File archivo;
-    private JMenu Escaner, parser;
+    private JMenu Escaner, parser,semantico;
 
     public static void main(String[] args) throws Exception {
         new App();
@@ -41,6 +41,7 @@ public class App extends JFrame implements ActionListener, MouseListener {
         JMenu MenuArchivo = new JMenu("Archivo");
         Escaner = new JMenu("Escaner");
         parser = new JMenu("Parser");
+        semantico = new JMenu("Semantico");
         error = new JLabel("");
         listado = new JPanel();
         txt = new JTextArea();
@@ -58,6 +59,7 @@ public class App extends JFrame implements ActionListener, MouseListener {
         txt.setFont(fuente);
         Escaner.setFont(fuente2);
         parser.setFont(fuente2);
+        semantico.setFont(fuente2);
         MenuArchivo.setFont(fuente2);
         error.setOpaque(true);
         error.setFont(fuente);
@@ -71,6 +73,7 @@ public class App extends JFrame implements ActionListener, MouseListener {
         BarraPrincipal.add(MenuArchivo);
         BarraPrincipal.add(Escaner);
         BarraPrincipal.add(parser);
+        BarraPrincipal.add(semantico);
         setJMenuBar(BarraPrincipal);
         add(txt);
         add(label);
@@ -85,6 +88,7 @@ public class App extends JFrame implements ActionListener, MouseListener {
         Guardar.addActionListener(this);
         Escaner.addMouseListener(this);
         parser.addMouseListener(this);
+        semantico.addMouseListener(this);
     }
 
     @Override
@@ -112,6 +116,10 @@ public class App extends JFrame implements ActionListener, MouseListener {
         }
         if (e.getSource() == parser) {
             Parser.Parsear();
+            return;
+        }
+        if (e.getSource() == semantico) {
+            Semantico.Semantico();
             return;
         }
     }

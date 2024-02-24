@@ -5,11 +5,14 @@ public class Parser {
     private static int cont;
     private static ArrayList<String[]> lista;
     private static boolean valido;
+    private static boolean esDeclaracion = false;
+    static ArrayList<Declaracion> declaraciones;
 
     public static void Parsear() {
         cont = 0;
         valido = false;
         lista = Scanner.tokens;
+        declaraciones = new ArrayList<>();
         if (lista.size() == 0) {
             App.error.setForeground(Color.red);
             App.error.setText("No se puede hacer parser sin hacer el Escaner");
@@ -55,6 +58,7 @@ public class Parser {
     }
 
     private static boolean instr() {
+        esDeclaracion = false;
         if (!(asig() || declarar() || impr() || si() || ciclo()))
             return false;
         cont++;
@@ -67,6 +71,9 @@ public class Parser {
     private static boolean declarar() {
         if (!lista.get(cont)[1].equals("Tipo de Dato"))
             return false;
+        esDeclaracion = true;
+        declaraciones.add(new Declaracion());
+        declaraciones.get(declaraciones.size() - 1).tipoDato = lista.get(cont)[0];
         cont++;
         return asig();
     }
@@ -191,6 +198,9 @@ public class Parser {
     private static boolean asig() {
         if (!lista.get(cont)[1].equals("Identificador"))
             return false;
+        if (!esDeclaracion)
+            declaraciones.add(new Declaracion());
+        declaraciones.get(declaraciones.size() - 1).identificador = lista.get(cont)[0];
         cont++;
         if (!lista.get(cont)[0].equals("=")) {
             cont--;
@@ -200,6 +210,52 @@ public class Parser {
         if (!(calc() || cadena() || leer()))
             return false;
         return true;
+    }
+
+    private static boolean cadena() {
+        if (!lista.get(cont)[0].equals("\""))
+            return false;
+        cont++;
+        if (!lista.get(cont)[1].equals("cadena"))
+            return false;
+        declaraciones.get(declaraciones.size() - 1).valor = lista.get(cont)[0];
+        cont++;
+        if (!lista.get(cont)[0].equals("\""))
+            return false;
+        cont++;
+        if (lista.get(cont)[0].equals(";"))
+            return true;
+        return false;
+    }
+
+    private static boolean calc() {
+        if (!(lista.get(cont)[1].equals("Identificador") ||
+                lista.get(cont)[1].equals("numero"))) {
+            return false;
+        }
+        cont++;
+        if (lista.get(cont)[0].equals(";")) {
+            declaraciones.get(declaraciones.size() - 1).valor = lista.get(cont-1)[0];
+            return true;
+        }
+        String operacion = lista.get(cont-1)[0] + " ";
+        if (!(lista.get(cont)[1].equals("Operador Aritmetico"))) {
+            cont--;
+            return false;
+        }
+        operacion += lista.get(cont)[0];
+        cont++;
+        if (!(lista.get(cont)[1].equals("Identificador") ||
+                lista.get(cont)[1].equals("numero"))) {
+            cont--;
+            return false;
+        }
+        declaraciones.get(declaraciones.size() - 1).valor = operacion + " " +lista.get(cont)[0];
+        cont++;
+        if (lista.get(cont)[0].equals(";"))
+            return true;
+        cont *= -1;
+        return false;
     }
 
     private static boolean leer() {
@@ -217,43 +273,4 @@ public class Parser {
         return false;
     }
 
-    private static boolean cadena() {
-        if (!lista.get(cont)[0].equals("\""))
-            return false;
-        cont++;
-        if (!lista.get(cont)[1].equals("cadena"))
-            return false;
-        cont++;
-        if (!lista.get(cont)[0].equals("\""))
-            return false;
-        cont++;
-        if (lista.get(cont)[0].equals(";"))
-            return true;
-        return false;
-    }
-
-    private static boolean calc() {
-        if (!(lista.get(cont)[1].equals("Identificador") ||
-                lista.get(cont)[1].equals("numero"))) {
-            return false;
-        }
-        cont++;
-        if (lista.get(cont)[0].equals(";"))
-            return true;
-        if (!(lista.get(cont)[1].equals("Operador Aritmetico"))) {
-            cont--;
-            return false;
-        }
-        cont++;
-        if (!(lista.get(cont)[1].equals("Identificador") ||
-                lista.get(cont)[1].equals("numero"))) {
-            cont--;
-            return false;
-        }
-        cont++;
-        if (lista.get(cont)[0].equals(";"))
-            return true;
-        cont *= -1;
-        return false;
-    }
 }
