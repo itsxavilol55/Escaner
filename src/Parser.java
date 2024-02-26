@@ -29,7 +29,7 @@ public class Parser {
             return;
         }
         App.error.setForeground(Color.green);
-        App.error.setText("El programa es Correcto");
+        App.error.setText("El programa es Correcto Sintaticamente");
     }
 
     private static void program() {
