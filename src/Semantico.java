@@ -21,8 +21,13 @@ public class Semantico {
                 App.error.setText("Error semantico, esta variable: " + declaracion.identificador + " no se ha declaro");
                 return;
             }
+            if (declaracion.valor.matches(".*[a-zA-Z].*") && !IDs.contains(declaracion.valor)) {//int a = b;
+                App.error.setForeground(Color.red);
+                App.error.setText("Error semantico, esta variable: " + declaracion.valor + " no se ha declaro");
+                return;
+            }
         }
         App.error.setForeground(Color.green);
-        App.error.setText("Programa correcto semanticamente");
+        App.error.setText("Programa correcto semanticamente");  
     }
 }
