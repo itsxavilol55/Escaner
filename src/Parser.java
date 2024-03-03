@@ -151,6 +151,7 @@ public class Parser {
     }
 
     private static boolean impr() {
+        declaraciones.add(new Declaracion());
         if (!lista.get(cont)[0].equals("imprimir"))
             return false;
         cont++;
@@ -158,6 +159,7 @@ public class Parser {
             return false;
         cont++;
         if (lista.get(cont)[1].equals("Identificador")) {
+            declaraciones.get(declaraciones.size() - 1).valor = lista.get(cont)[0];
             cont++;
             if (!lista.get(cont)[1].equals("right_parenthesis"))
                 return false;
@@ -186,6 +188,7 @@ public class Parser {
         cont++;
         if (!lista.get(cont)[1].equals("Identificador"))
             return false;
+        declaraciones.get(declaraciones.size() - 1).valor = lista.get(cont)[0];
         cont++;
         if (!lista.get(cont)[1].equals("right_parenthesis"))
             return false;
@@ -218,7 +221,7 @@ public class Parser {
         cont++;
         if (!lista.get(cont)[1].equals("cadena"))
             return false;
-        declaraciones.get(declaraciones.size() - 1).valor = lista.get(cont)[0];
+        declaraciones.get(declaraciones.size() - 1).valor = lista.get(cont)[1];
         cont++;
         if (!lista.get(cont)[0].equals("\""))
             return false;
