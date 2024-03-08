@@ -151,9 +151,9 @@ public class Parser {
     }
 
     private static boolean impr() {
-        declaraciones.add(new Declaracion());
         if (!lista.get(cont)[0].equals("imprimir"))
             return false;
+        declaraciones.add(new Declaracion());
         cont++;
         if (!lista.get(cont)[1].equals("left_parenthesis"))
             return false;
