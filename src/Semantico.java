@@ -20,7 +20,7 @@ public class Semantico {
                 IDs.add(declaracion.identificador);
             }
             if (declaracion.identificador == null) {
-                if (variableDeclarada(declaracion.valor)) {
+                if (declaracion.valor != null && validaOperacion(declaracion.valor)) {
                     return;
                 } else {
                     mensajeCorrecto();
@@ -29,16 +29,22 @@ public class Semantico {
             }
             if (variableDeclarada(declaracion.identificador))
                 return;
-            if (declaracion.valor.matches(".*[a-zA-Z].*") && !declaracion.valor.equals("cadena")) {
-                String[] operacion = declaracion.valor.split(" ");
-                for (String valor : operacion) {
-                    if (valor.matches(".*[a-zA-Z].*"))
-                        if (variableDeclarada(valor))
-                            return;
-                }
-            }
+            if (declaracion.valor != null && validaOperacion(declaracion.valor)) 
+                return;
         }
         mensajeCorrecto();
+    }
+
+    private static boolean validaOperacion(String operacion) {
+        if (operacion.matches(".*[a-zA-Z].*") && !operacion.equals("cadena")) {
+            String[] operaciones = operacion.split(" ");
+            for (String valor : operaciones) {
+                if (valor.matches(".*[a-zA-Z].*"))
+                    if(variableDeclarada(valor))
+                        return true;
+            }
+        }
+        return false;
     }
 
     private static void mensajeCorrecto() {

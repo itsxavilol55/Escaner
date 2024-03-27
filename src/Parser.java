@@ -96,6 +96,8 @@ public class Parser {
         cont++;
         if (!lista.get(cont)[1].equals("Identificador"))
             return false;
+        declaraciones.add(new Declaracion());
+        declaraciones.get(declaraciones.size() - 1).identificador = lista.get(cont)[0];
         cont++;
         if (!(lista.get(cont)[0].equals("++") ||
                 lista.get(cont)[0].equals("--")))
@@ -139,14 +141,19 @@ public class Parser {
                 lista.get(cont)[1].equals("numero"))) {
             return false;
         }
+        String condicion = lista.get(cont)[0] + " ";
         cont++;
         if (!lista.get(cont)[1].equals("Operador Relacional"))
             return false;
+        condicion += lista.get(cont)[0] +" ";
         cont++;
         if (!(lista.get(cont)[1].equals("Identificador") ||
                 lista.get(cont)[1].equals("numero"))) {
             return false;
         }
+        condicion += lista.get(cont)[0] +" ";
+        declaraciones.add(new Declaracion());
+        declaraciones.get(declaraciones.size() - 1).valor = condicion;
         return true;
     }
 
