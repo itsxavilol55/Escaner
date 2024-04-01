@@ -18,6 +18,27 @@ public class Semantico {
                     return;
                 }
                 IDs.add(declaracion.identificador);
+                if (declaracion.tipoDato.equals("string") && declaracion.valor.equals("cadena")) {
+                    mensajeCorrecto();
+                    continue;
+                }
+                if (declaracion.tipoDato.equals("int") && declaracion.valor.matches("^-?\\d+$")) {
+                    mensajeCorrecto();
+                    continue;
+                }
+                if (declaracion.tipoDato.equals("double") && declaracion.valor.matches("^-?\\d+\\.\\d+$")) {
+                    mensajeCorrecto();
+                    continue;
+                }
+                if (declaracion.tipoDato.equals("boolean") && declaracion.valor.matches("false|true")) {
+                    mensajeCorrecto();
+                    continue;
+                }
+                App.error.setForeground(Color.red);
+                App.error.setText("Error semantico, la variable " + declaracion.identificador
+                        + " no es el del tipo correcto");
+                return;
+
             }
             if (declaracion.identificador == null) {
                 if (declaracion.valor != null && validaOperacion(declaracion.valor)) {
@@ -29,7 +50,7 @@ public class Semantico {
             }
             if (variableDeclarada(declaracion.identificador))
                 return;
-            if (declaracion.valor != null && validaOperacion(declaracion.valor)) 
+            if (declaracion.valor != null && validaOperacion(declaracion.valor))
                 return;
         }
         mensajeCorrecto();
@@ -40,7 +61,7 @@ public class Semantico {
             String[] operaciones = operacion.split(" ");
             for (String valor : operaciones) {
                 if (valor.matches(".*[a-zA-Z].*"))
-                    if(variableDeclarada(valor))
+                    if (variableDeclarada(valor))
                         return true;
             }
         }
