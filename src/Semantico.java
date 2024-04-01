@@ -1,23 +1,22 @@
 import java.awt.Color;
-import java.util.ArrayList;
+import java.util.Hashtable;
 
 public class Semantico {
-    static ArrayList<String> IDs;
-
+    static Hashtable<String, String> IDs;
     public static void Semantico() {
-        IDs = new ArrayList<>();
+        IDs = new Hashtable<>();
         for (Declaracion declaracion : Parser.declaraciones) {// analiza declaracion por declaracion
             if (declaracion.tipoDato != null)
             // si tipo de dato es diferente de null significa que es una declaracion de
             // variable(int a = 0;)
             {
-                if (IDs.contains(declaracion.identificador)) {
+                if (IDs.containsKey(declaracion.identificador)) {
                     App.error.setForeground(Color.red);
                     App.error
                             .setText("Error semantico, esta variable: " + declaracion.identificador + " ya se declaro");
                     return;
                 }
-                IDs.add(declaracion.identificador);
+                IDs.put(declaracion.identificador,declaracion.tipoDato);
                 if (declaracion.tipoDato.equals("string") && declaracion.valor.equals("cadena")) {
                     mensajeCorrecto();
                     continue;
@@ -33,6 +32,13 @@ public class Semantico {
                 if (declaracion.tipoDato.equals("boolean") && declaracion.valor.matches("false|true")) {
                     mensajeCorrecto();
                     continue;
+                }
+                if(!declaracion.valor.equals("cadena") && !declaracion.valor.matches("false|true"))
+                {
+                    if (declaracion.tipoDato.equals(IDs.get(declaracion.valor))) {
+                        mensajeCorrecto();
+                        continue;
+                    }
                 }
                 App.error.setForeground(Color.red);
                 App.error.setText("Error semantico, la variable " + declaracion.identificador
@@ -74,7 +80,7 @@ public class Semantico {
     }
 
     private static boolean variableDeclarada(String id) {
-        if (!IDs.contains(id)) {
+        if (!IDs.containsKey(id)) {
             App.error.setForeground(Color.red);
             App.error.setText("Error semantico, esta variable: " + id + " no se ha declaro");
             return true;
