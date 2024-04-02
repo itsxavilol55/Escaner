@@ -3,6 +3,7 @@ import java.util.Hashtable;
 
 public class Semantico {
     static Hashtable<String, String> IDs;
+
     public static void Semantico() {
         IDs = new Hashtable<>();
         for (Declaracion declaracion : Parser.declaraciones) {// analiza declaracion por declaracion
@@ -16,7 +17,7 @@ public class Semantico {
                             .setText("Error semantico, esta variable: " + declaracion.identificador + " ya se declaro");
                     return;
                 }
-                IDs.put(declaracion.identificador,declaracion.tipoDato);
+                IDs.put(declaracion.identificador, declaracion.tipoDato);
                 if (declaracion.tipoDato.equals("string") && declaracion.valor.equals("cadena")) {
                     mensajeCorrecto();
                     continue;
@@ -33,9 +34,12 @@ public class Semantico {
                     mensajeCorrecto();
                     continue;
                 }
-                if(!declaracion.valor.equals("cadena") && !declaracion.valor.matches("false|true"))
-                {
+                if (!declaracion.valor.equals("cadena") && !declaracion.valor.matches("false|true")) {
                     if (declaracion.tipoDato.equals(IDs.get(declaracion.valor))) {
+                        mensajeCorrecto();
+                        continue;
+                    }
+                    if(!validaOperacion(declaracion.valor, declaracion)){
                         mensajeCorrecto();
                         continue;
                     }
@@ -47,7 +51,7 @@ public class Semantico {
 
             }
             if (declaracion.identificador == null) {
-                if (declaracion.valor != null && validaOperacion(declaracion.valor)) {
+                if (declaracion.valor != null && validaOperacion(declaracion.valor, declaracion)) {
                     return;
                 } else {
                     mensajeCorrecto();
@@ -56,19 +60,29 @@ public class Semantico {
             }
             if (variableDeclarada(declaracion.identificador))
                 return;
-            if (declaracion.valor != null && validaOperacion(declaracion.valor))
+            if (declaracion.valor != null && validaOperacion(declaracion.valor, declaracion))
                 return;
         }
         mensajeCorrecto();
     }
 
-    private static boolean validaOperacion(String operacion) {
+    private static boolean validaOperacion(String operacion, Declaracion declaracion) {
         if (operacion.matches(".*[a-zA-Z].*") && !operacion.equals("cadena")) {
             String[] operaciones = operacion.split(" ");
             for (String valor : operaciones) {
-                if (valor.matches(".*[a-zA-Z].*"))
+                if (valor.matches(".*[a-zA-Z].*")) {
                     if (variableDeclarada(valor))
                         return true;
+                    if (declaracion.identificador != null && IDs.get(valor).equals(IDs.get(declaracion.identificador))) {
+                        mensajeCorrecto();
+                    }
+                    else{
+                        App.error.setForeground(Color.red);
+                        App.error.setText("Error semantico, la variable " + declaracion.identificador
+                        + " no es el del tipo correcto");
+                        return true;
+                    }
+                }
             }
         }
         return false;
