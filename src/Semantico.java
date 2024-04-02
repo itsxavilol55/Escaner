@@ -34,14 +34,17 @@ public class Semantico {
                     mensajeCorrecto();
                     continue;
                 }
-                if (!declaracion.valor.equals("cadena") && !declaracion.valor.matches("false|true")) {
-                    if (declaracion.tipoDato.equals(IDs.get(declaracion.valor))) {
-                        mensajeCorrecto();
-                        continue;
-                    }
-                    if(!validaOperacion(declaracion.valor, declaracion)){
-                        mensajeCorrecto();
-                        continue;
+                if(!(declaracion.valor.matches("^-?\\d+$") || declaracion.valor.matches("^-?\\d+\\.\\d+$")))
+                {
+                    if (!declaracion.valor.equals("cadena") && !declaracion.valor.matches("false|true")) {
+                        if (declaracion.tipoDato.equals(IDs.get(declaracion.valor))) {
+                            mensajeCorrecto();
+                            continue;
+                        }
+                        if(!validaOperacion(declaracion.valor, declaracion)){
+                            mensajeCorrecto();
+                            continue;
+                        }
                     }
                 }
                 App.error.setForeground(Color.red);
