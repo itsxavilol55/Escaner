@@ -14,8 +14,8 @@ public class Parser {
         lista = Scanner.tokens;
         declaraciones = new ArrayList<>();
         if (lista.size() == 0) {
-            App.error.setForeground(Color.red);
-            App.error.setText("No se puede hacer parser sin hacer el Escaner");
+            App.errorSint.setForeground(Color.red);
+            App.errorSint.setText("No se puede hacer parser sin hacer el Escaner");
             return;
         }
         try {
@@ -24,12 +24,12 @@ public class Parser {
 
         }
         if (!valido) {
-            App.error.setForeground(Color.red);
-            App.error.setText("El programa no es correcto");
+            App.errorSint.setForeground(Color.red);
+            App.errorSint.setText("El programa no es correcto");
             return;
         }
-        App.error.setForeground(Color.green);
-        App.error.setText("El programa es Correcto Sintaticamente");
+        App.errorSint.setForeground(Color.green);
+        App.errorSint.setText("El programa es Correcto Sintaticamente");
     }
 
     private static void program() {

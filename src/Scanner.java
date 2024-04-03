@@ -41,7 +41,8 @@ public class Scanner {
         isError = false;
         tokens.clear();
         App.Limpiar();
-        App.error.setText("");
+        App.errorSint.setText("");
+        App.errorSema.setText("");
         String[] lineas = App.txt.getText().split("\\r?\\n");
         for (String linea : lineas) {
             validarToken(linea);
@@ -61,7 +62,7 @@ public class Scanner {
             label.setFont(fuente);
             App.listado.add(label);
         }
-        App.error.setText("");
+        App.errorSint.setText("");
         App.valida();
         App.listado.update(App.listado.getGraphics());
     }
@@ -89,8 +90,8 @@ public class Scanner {
         linea += " ";
         int length = linea.length();
         if (length <= 1) {
-            App.error.setForeground(Color.red);
-            App.error.setText("El Programa esta vacio");
+            App.errorSint.setForeground(Color.red);
+            App.errorSint.setText("El Programa esta vacio");
             return;
         }
         for (int i = 0; i < length; i++) {
@@ -191,8 +192,8 @@ public class Scanner {
 
     private static void mensajeError(String mensaje) {
         isError = true;
-        App.error.setForeground(Color.red);
-        App.error.setText(mensaje + " -Linea: " + LineaCont);
+        App.errorSint.setForeground(Color.red);
+        App.errorSint.setText(mensaje + " -Linea: " + LineaCont);
         tokens.clear();
         App.Limpiar();
     }

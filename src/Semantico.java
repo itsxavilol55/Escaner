@@ -12,8 +12,8 @@ public class Semantico {
             // variable(int a = 0;)
             {
                 if (IDs.containsKey(declaracion.identificador)) {
-                    App.error.setForeground(Color.red);
-                    App.error
+                    App.errorSema.setForeground(Color.red);
+                    App.errorSema
                             .setText("Error semantico, esta variable: " + declaracion.identificador + " ya se declaro");
                     return;
                 }
@@ -47,8 +47,8 @@ public class Semantico {
                         }
                     }
                 }
-                App.error.setForeground(Color.red);
-                App.error.setText("Error semantico, la variable " + declaracion.identificador
+                App.errorSema.setForeground(Color.red);
+                App.errorSema.setText("Error semantico, la variable " + declaracion.identificador
                         + " no es el del tipo correcto");
                 return;
 
@@ -80,8 +80,8 @@ public class Semantico {
                         mensajeCorrecto();
                     }
                     else{
-                        App.error.setForeground(Color.red);
-                        App.error.setText("Error semantico, la variable " + declaracion.identificador
+                        App.errorSema.setForeground(Color.red);
+                        App.errorSema.setText("Error semantico, la variable " + declaracion.identificador
                         + " no es el del tipo correcto");
                         return true;
                     }
@@ -92,14 +92,14 @@ public class Semantico {
     }
 
     private static void mensajeCorrecto() {
-        App.error.setForeground(Color.green);
-        App.error.setText("Programa correcto semanticamente");
+        App.errorSema.setForeground(Color.green);
+        App.errorSema.setText("Programa correcto semanticamente");
     }
 
     private static boolean variableDeclarada(String id) {
         if (!IDs.containsKey(id)) {
-            App.error.setForeground(Color.red);
-            App.error.setText("Error semantico, esta variable: " + id + " no se ha declaro");
+            App.errorSema.setForeground(Color.red);
+            App.errorSema.setText("Error semantico, esta variable: " + id + " no se ha declaro");
             return true;
         }
         return false;
