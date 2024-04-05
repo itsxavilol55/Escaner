@@ -229,6 +229,7 @@ public class Parser {
         if (!lista.get(cont)[1].equals("cadena"))
             return false;
         declaraciones.get(declaraciones.size() - 1).valor = lista.get(cont)[1];
+        declaraciones.get(declaraciones.size() - 1).cadena = lista.get(cont)[0];
         cont++;
         if (!lista.get(cont)[0].equals("\""))
             return false;

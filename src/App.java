@@ -9,15 +9,15 @@ import java.io.IOException;
 
 public class App extends JFrame implements ActionListener, MouseListener {
     private JMenuItem Nuevo, Abrir, Guardar;
-    static JTextArea txt;
-    private JScrollPane scrollListado;
+    static JTextArea txt,txtAsm;
+    private JScrollPane scrollListado,scrolltxt,scrolltxtAsm;
     static JPanel listado;
     static JLabel errorSint, errorSema;
     private static JFrame panel;
     private Font fuente = new Font("Tahoma", 16, 19);
     private Font fuente2 = new Font("Tahoma", 16, 17);
     private File archivo;
-    private JMenu Escaner, parser,semantico;
+    private JMenu Escaner, parser,semantico,intermedio;
 
     public static void main(String[] args) throws Exception {
         new App();
@@ -44,11 +44,15 @@ public class App extends JFrame implements ActionListener, MouseListener {
         Escaner = new JMenu("Escaner");
         parser = new JMenu("Parser");
         semantico = new JMenu("Semantico");
+        intermedio = new JMenu("Intermedio");
         errorSint = new JLabel("");
         errorSema = new JLabel("");
         listado = new JPanel();
         txt = new JTextArea();
+        txtAsm = new JTextArea();
         scrollListado = new JScrollPane(listado);
+        scrolltxt = new JScrollPane(txt);
+        scrolltxtAsm = new JScrollPane(txtAsm);
         Nuevo = new JMenuItem("Nuevo"); // Agregar botones y menu
         Abrir = new JMenuItem("Abrir");
         Guardar = new JMenuItem("Guardar");
@@ -57,17 +61,22 @@ public class App extends JFrame implements ActionListener, MouseListener {
             labelSint.setBounds(1000, 10, 200, 30);
             labelSema.setBounds(1000, 70, 200, 30);
             scrollListado.setBounds(530, 25, 450, 400);
-            txt.setBounds(20, 25, 500, 400);
+            scrolltxt.setBounds(20, 25, 500, 400);
+            scrolltxtAsm.setBounds(20, 450, 650, 450);
             errorSint.setBounds(1000, 40, 500, 30);
             errorSema.setBounds(1000, 110, 500, 30);
         }
         txt.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         txt.setFont(fuente);
+        txtAsm.setFont(fuente);
+        txtAsm.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        txtAsm.setEditable(false);
         labelSint.setFont(fuente);
         labelSema.setFont(fuente);
         Escaner.setFont(fuente2);
         parser.setFont(fuente2);
         semantico.setFont(fuente2);
+        intermedio.setFont(fuente2);
         MenuArchivo.setFont(fuente2);
         errorSint.setOpaque(true);
         errorSint.setFont(fuente2);
@@ -86,8 +95,10 @@ public class App extends JFrame implements ActionListener, MouseListener {
         BarraPrincipal.add(Escaner);
         BarraPrincipal.add(parser);
         BarraPrincipal.add(semantico);
+        BarraPrincipal.add(intermedio);
         setJMenuBar(BarraPrincipal);
-        add(txt);
+        add(scrolltxt);
+        add(scrolltxtAsm);
         add(label);
         add(errorSema);
         add(labelSint);
@@ -104,6 +115,7 @@ public class App extends JFrame implements ActionListener, MouseListener {
         Escaner.addMouseListener(this);
         parser.addMouseListener(this);
         semantico.addMouseListener(this);
+        intermedio.addMouseListener(this);
     }
 
     @Override
@@ -135,6 +147,10 @@ public class App extends JFrame implements ActionListener, MouseListener {
         }
         if (e.getSource() == semantico) {
             Semantico.Semantico();
+            return;
+        }
+        if (e.getSource() == intermedio) {
+            Intermedio.intermedio();
             return;
         }
     }

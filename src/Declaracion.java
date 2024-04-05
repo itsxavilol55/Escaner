@@ -2,6 +2,7 @@ public class Declaracion {
     String tipoDato;
     String identificador;
     String valor;
+    String cadena;
     public Declaracion() {
         
     }
