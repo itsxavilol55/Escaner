@@ -88,7 +88,18 @@ public class Semantico {
                 }
             }
         }
-        return false;
+        if (declaracion.valor.matches("^-?\\d+$") && IDs.get(declaracion.identificador).equals("int")) {
+            mensajeCorrecto();
+            return false;
+        }
+        if (declaracion.valor.matches("^-?\\d+\\.\\d+$") && IDs.get(declaracion.identificador).equals("double")) {
+            mensajeCorrecto();
+            return false;
+        }
+        App.errorSema.setForeground(Color.red);
+        App.errorSema.setText("Error semantico, la variable " + declaracion.identificador
+        + " no es el del tipo correcto");
+        return true;
     }
 
     private static void mensajeCorrecto() {

@@ -10,16 +10,25 @@ public class Intermedio {
         tiposDato.put("boolean", "db");
         tiposDato.put("string", "db");
         puntoData = new StringBuilder("\t.Data\n");
-        puntoCode = new StringBuilder("\t.Code");
+        puntoCode = new StringBuilder("\t.Code\n");
         App.txtAsm.setText("");
         for (Declaracion declaracion : Parser.declaraciones){
             if(declaracion.tipoDato != null)
                 definirVariable(declaracion);
+            else if(declaracion.identificador != null)
+                definirAsignacion(declaracion);
             System.out.println(declaracion.tipoDato);
             System.out.println(declaracion.identificador);
             System.out.println(declaracion.valor);
         }
         App.txtAsm.setText(puntoData.append(puntoCode).toString());
+    }
+    private static void definirAsignacion(Declaracion declaracion) {
+        if(declaracion.valor.matches("^-?\\d+$") || declaracion.valor.matches("^-?\\d+\\.\\d+$")){
+            puntoCode.append("mov\t");
+            puntoCode.append(declaracion.identificador +",\t");
+            puntoCode.append(declaracion.valor + "\n");
+        }
     }
     private static void definirVariable(Declaracion declaracion) {
         puntoData.append(declaracion.identificador +"\t");

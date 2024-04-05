@@ -43,6 +43,7 @@ public class Scanner {
         App.Limpiar();
         App.errorSint.setText("");
         App.errorSema.setText("");
+        App.txtAsm.setText("");
         String[] lineas = App.txt.getText().split("\\r?\\n");
         for (String linea : lineas) {
             validarToken(linea);
