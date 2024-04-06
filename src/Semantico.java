@@ -70,14 +70,17 @@ public class Semantico {
     }
 
     private static boolean validaOperacion(String operacion, Declaracion declaracion) {
-        if (operacion.matches(".*[a-zA-Z].*") && !operacion.equals("cadena")) {
+        if (declaracion.valor.matches("^.*(\\-|\\+|\\*|\\/|\\^|\\%).*$") || (operacion.matches(".*[a-zA-Z].*") && !operacion.equals("cadena"))) {
             String[] operaciones = operacion.split(" ");
+            int cont = 0;
             for (String valor : operaciones) {
+                cont++;
                 if (valor.matches(".*[a-zA-Z].*")) {
                     if (variableDeclarada(valor))
                         return true;
                     if (declaracion.identificador != null && IDs.get(valor).equals(IDs.get(declaracion.identificador))) {
                         mensajeCorrecto();
+                        continue;
                     }
                     else{
                         App.errorSema.setForeground(Color.red);
@@ -86,19 +89,45 @@ public class Semantico {
                         return true;
                     }
                 }
+                if(valor.matches("[-+*/^%]")){
+                    continue;
+                }
+                if(!validaNoVariables(valor,IDs.get(declaracion.identificador))){
+                    if(cont==3)
+                        return false;
+                    else
+                        continue;
+                }
+                else{
+                    App.errorSema.setForeground(Color.red);
+                    App.errorSema.setText("Error semantico, la variable " + declaracion.identificador
+                        + " no es el del tipo correcto");
+                    return true;
+                }
             }
-        }
-        if (declaracion.valor.matches("^-?\\d+$") && IDs.get(declaracion.identificador).equals("int")) {
-            mensajeCorrecto();
             return false;
         }
-        if (declaracion.valor.matches("^-?\\d+\\.\\d+$") && IDs.get(declaracion.identificador).equals("double")) {
-            mensajeCorrecto();
+        if(!validaNoVariables(declaracion.valor,IDs.get(declaracion.identificador)))
             return false;
-        }
         App.errorSema.setForeground(Color.red);
         App.errorSema.setText("Error semantico, la variable " + declaracion.identificador
         + " no es el del tipo correcto");
+        return true;
+    }
+
+    private static boolean validaNoVariables(String valor1, String valor2) {
+        if (valor1.matches("^-?\\d+$") && valor2.equals("int")) {
+            mensajeCorrecto();
+            return false;
+        }
+        if (valor1.matches("^-?\\d+\\.\\d+$") && valor2.equals("double")) {
+            mensajeCorrecto();
+            return false;
+        }
+        if (valor1.equals("cadena") && valor2.equals("string")) {
+            mensajeCorrecto();
+            return false;
+        }
         return true;
     }
 
