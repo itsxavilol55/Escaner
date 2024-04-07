@@ -3,22 +3,31 @@ import java.util.Hashtable;
 public class Intermedio {
     static StringBuilder puntoData;
     static StringBuilder puntoCode;
-    private static Hashtable<String, String> tiposDato;
+    private static Hashtable<String, String> tiposDato,operacionesT;
 
     static void intermedio() {
         tiposDato = new Hashtable<String, String>();
+        operacionesT = new Hashtable<String, String>();
         tiposDato.put("int", "dw");
         tiposDato.put("double", "dd");
         tiposDato.put("boolean", "db");
         tiposDato.put("string", "db");
+        operacionesT.put("+", "add");
+        operacionesT.put("-", "sub");
+        operacionesT.put("*", "mul");
+        operacionesT.put("/", "div");
+        operacionesT.put("^", "exp");
+        operacionesT.put("%", "mod");
         puntoData = new StringBuilder("\t.Data\n");
         puntoCode = new StringBuilder("\t.Code\n");
         App.txtAsm.setText("");
         for (Declaracion declaracion : Parser.declaraciones) {
             if (declaracion.tipoDato != null)
                 definirVariable(declaracion);
-            else if (declaracion.identificador != null)
+            else if (declaracion.identificador != null){
                 definirAsignacion(declaracion);
+                puntoCode.append("\n");
+            }
         }
         App.txtAsm.setText(puntoData.append(puntoCode).toString());
     }
@@ -57,9 +66,14 @@ public class Intermedio {
             return;
         }
         String[] operaciones = declaracion.valor.split(" ");
-        for (int i = operaciones.length-1; i >= 0; i--) {
-            System.out.println("------"+operaciones[i]);
-        }
+        puntoCode.append("ax,\t");
+        puntoCode.append(operaciones[0] + "\n");
+        puntoCode.append(operacionesT.get(operaciones[1])+"\t");
+        puntoCode.append("ax,\t");
+        puntoCode.append(operaciones[2] + "\n");
+        puntoCode.append("mov\t");
+        puntoCode.append(declaracion.identificador + ",\t");
+        puntoCode.append("ax\n");
     }
 
     private static void definirVariable(Declaracion declaracion) {
