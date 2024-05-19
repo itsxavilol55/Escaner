@@ -5,12 +5,13 @@ public class Intermedio {
     static StringBuilder puntoData;
     static StringBuilder puntoCode;
     static int contadorSegmento = 0;
-    private static Hashtable<String, String> tiposDato,operacionesT;
+    public static Hashtable<String, String> tiposDato,operacionesT,segmento;
     private static Hashtable<Integer, String> hexadecimal;
 
     static void intermedio() {
         contadorSegmento = 0;
         tiposDato = new Hashtable<String, String>();
+        segmento = new Hashtable<String, String>();
         operacionesT = new Hashtable<String, String>();
         hexadecimal = new Hashtable<Integer, String>();
         tiposDato.put("int", "dw");
@@ -98,7 +99,9 @@ public class Intermedio {
     }
 
     private static void definirVariable(Declaracion declaracion) {
-        puntoData.append("0000:"+decAhex(contadorSegmento) + "\t");
+        String valorhex = decAhex(contadorSegmento);
+        segmento.put(declaracion.identificador, valorhex);
+        puntoData.append("0000:"+valorhex + "\t");
         puntoData.append(declaracion.identificador + "\t");
         puntoData.append(tiposDato.get(declaracion.tipoDato) + "\t");
         if (declaracion.valor.equals("true")){
@@ -127,9 +130,11 @@ public class Intermedio {
             pila.push(hexadecimal.get(divisor % 16));
             divisor = (int) Math.floor(divisor / 16);
         } while (divisor != 0);
-        int total = pila.size();
-        for (int i = 0; i < total; i++) {
-            hex += pila.pop();
+        for (int i = 0; i < 4; i++) {
+            if(pila.isEmpty())
+                hex = 0 + hex;
+            else
+                hex += pila.pop();
         }
         return hex;
     }

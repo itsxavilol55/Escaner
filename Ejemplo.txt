@@ -1,17 +1,20 @@
-Program Ejemplo1
-{
-      for(contador = 0; contador < 4; contador++)
-      {
-           imprimir("Escribe un numero");
-           n = leerDato();
-           if(n > mayor)
-          {	
-	x = s + 5;
-            }
-            else 
-             {	
-	x = s - 5;
-            }
-      }
-       imprimir("el numero mayor es ", mayor);
+Program Ejemplo1 {
+      int a = 16;
+      boolean c = true;
+      string d = "cadena";
+      int num1 = 300;
+      int num2 = 1000;
+      int num3 = 77;
+      int num4 = 7123;
+      int resultado1 = 0;
+      int resultado2 = 0;
+      int resultado3 = 0;
+      int resultado4 = 0;
+      int resultado5 = 0;
+	a = num1;
+	num2 = 40;
+      num1 = 45 + num3;
+	num3 = num4 / 23;
+      num4 = a * num2;
+	resultado1 = 23 - 2883;
 }
